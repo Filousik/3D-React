@@ -1,6 +1,6 @@
 import './App.css'
 import Hero from './components/Hero/Hero'
-import Navbar from './components/Navbar'
+import Navbar from './components/Navbar/Navbar'
 
 function App() {
 
@@ -8,7 +8,6 @@ function App() {
     <>
     
       <Navbar></Navbar>
-      <h1>GA PROJEKT Dag 1</h1>
       <Hero></Hero>
 
     </>

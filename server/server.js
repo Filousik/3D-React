@@ -10,4 +10,4 @@ app.use(express.static(path.join(__dirname, "../client/dist")));
 
 
 
-app.listen(port, ()=>{console.log("Server is running")});
+app.listen(port, ()=>{console.log("http://localhost:"+port)});

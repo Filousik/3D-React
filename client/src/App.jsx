@@ -1,18 +1,26 @@
 import './App.css'
+import Header from './components/Header/Header.jsx'
+import Footer from './components/Footer/Footer.jsx'
 import Hero from './components/Hero/Hero'
-import Navbar from './components/Navbar/Navbar'
 import Card from './components/Card/Card.jsx'
+
+
 
 function App() {
 
   return (
     <>
       
-      <Navbar></Navbar>
+      <Header></Header>
       <Hero></Hero>
-      <Card theText={"nibba"}></Card>
+      <Footer></Footer>
+      
     </>
   )
 }
 
 export default App
+
+
+
+

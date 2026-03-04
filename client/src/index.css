@@ -36,3 +36,32 @@ a{
     border: 0;
     outline: 0;
 }
+
+header{
+    width: 100%;
+    background-color: rgb(228, 186, 228);
+    opacity: 1;
+    color: #ffff;
+    height: 150px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+}
+
+.logo{
+    width: 180px;
+    
+}
+
+.hero{
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(rgba(8,0,58,0.7),rgba(8,0,58,0.7)), url('../../assests/hero.jpg');
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+}

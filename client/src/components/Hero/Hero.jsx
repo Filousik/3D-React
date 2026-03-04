@@ -1,6 +1,6 @@
 import Card from '../Card/Card.jsx'
 import React, { useState } from "react"
-import './Hero.css'
+
 
 
 

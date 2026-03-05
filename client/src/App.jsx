@@ -6,16 +6,13 @@ import React, { useState } from "react"
 
 
 function App() {
-  const [page, setPage] = useState(0);
-
-  function handleClick(){
-    setPage(page + 1);
-  }
+ 
 
   return (
     <>
       
       <Header></Header>
+      
       <Empty></Empty>
       <Footer></Footer>
       
@@ -44,6 +41,8 @@ function Header(){
           <a class="btn"href="">About</a>
           <a class="btn"href="">Register</a>
           <a class="btn"href="">Login</a>
+          <PageButton></PageButton>
+          
           
           
 
@@ -74,3 +73,21 @@ function Empty(){
 }
 
 
+function PageButton(){
+const [page, setPage]= useState(0);
+
+function handleClick(){
+  setPage(page+1);
+}
+
+return(
+  <button class="btn"onClick={handleClick}>
+  Page is {page}
+  </button>
+  
+
+  
+
+ 
+);
+}

@@ -6,6 +6,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Outfit", sans-serif;
+    scroll-behavior: smooth;
 }
 
 body{
@@ -64,4 +65,10 @@ header{
     background-size: cover;
     background-position: center;
     color: #fff;
+}
+
+.empty{
+    height: 120vh;
+    width: 100%;
+    background-color: darkmagenta;
 }

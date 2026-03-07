@@ -1,19 +1,26 @@
 import './App.css'
 import Hero from './components/Hero/Hero'
 import Card from './components/Card/Card.jsx'
+import About from './components/About/About.jsx'
+import Home from './components/Home/Home.jsx'
+
 import React, { useState } from "react"
 
 
 
 function App() {
+ const [page, setPage] = useState(0);
+
  
 
   return (
     <>
       
-      <Header></Header>
+      <Header page={page} setPage={setPage}></Header>
+
+      {page === 0 && <Home />}
+      {page === 1 && <About />}
       
-      <Empty></Empty>
       <Footer></Footer>
       
     </>
@@ -23,30 +30,29 @@ function App() {
 export default App
 function Button({page, onClick}){
   return(
-    <button onClick={onClick}class="btn">Next page</button>
+    <button onClick={onClick}className="btn">Next page</button>
   )
 }
 
 
 
 
-function Header(){
+function Header({page, setPage}){
   return(
     <header>
       
 
       <nav className='container'>
           <img src="" alt="" className='logo' />
-          <a class="btn"href="">Home</a>
-          <a class="btn"href="">About</a>
-          <a class="btn"href="">Register</a>
-          <a class="btn"href="">Login</a>
-          <PageButton></PageButton>
+          <button className="btn" onClick={()=>setPage(0)}>Home</button>
+          <button className="btn" onClick={()=>setPage(1)}>About</button>
+          
           
           
           
 
      </nav>
+
 
     </header>
 
@@ -68,26 +74,8 @@ function Footer(){
 function Empty(){
 
   return(
-    <div class="empty"></div>
+    <div className="empty"></div>
   )
 }
 
 
-function PageButton(){
-const [page, setPage]= useState(0);
-
-function handleClick(){
-  setPage(page+1);
-}
-
-return(
-  <button class="btn"onClick={handleClick}>
-  Page is {page}
-  </button>
-  
-
-  
-
- 
-);
-}

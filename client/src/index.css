@@ -72,3 +72,17 @@ header{
     width: 100%;
     background-color: darkmagenta;
 }
+
+.Home{
+    background-color: pink;
+    min-height: 130vh;
+    font-size: 36px;
+}
+
+.About{
+    background-color: rgb(177, 25, 167);
+    min-height: 130vh;
+    font-size: 36px;
+
+
+}

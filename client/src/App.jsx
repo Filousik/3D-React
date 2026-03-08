@@ -3,6 +3,7 @@ import Hero from './components/Hero/Hero'
 import Card from './components/Card/Card.jsx'
 import About from './components/About/About.jsx'
 import Home from './components/Home/Home.jsx'
+import Upload from './components/Upload/Upload.jsx'
 
 import React, { useState } from "react"
 
@@ -10,6 +11,7 @@ import React, { useState } from "react"
 
 function App() {
  const [page, setPage] = useState(0);
+ const [cards, setCards] = useState([]);
 
  
 
@@ -20,6 +22,7 @@ function App() {
 
       {page === 0 && <Home />}
       {page === 1 && <About />}
+      {page === 2 && <Upload/>}
       
       <Footer></Footer>
       
@@ -46,6 +49,7 @@ function Header({page, setPage}){
           <img src="" alt="" className='logo' />
           <button className="btn" onClick={()=>setPage(0)}>Home</button>
           <button className="btn" onClick={()=>setPage(1)}>About</button>
+          <button className="btn" onClick={()=>setPage(2)}>Upload</button>
           
           
           

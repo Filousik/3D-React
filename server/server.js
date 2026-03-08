@@ -1,16 +1,27 @@
 //*Test*//
+import uploadRoutes from "./routes/upload.routes.js"
+import express from "express"
+import path from "path"
+import { fileURLToPath } from "url";
 
-const express = require("express");
 const app = express();
-const path = require("path");
+const port = 1555;
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+app.listen(port, ()=>{console.log("http://localhost:"+port)});
+
 app.use(express.json());
 
-const port = 1555;
+app.use("/uploads", express.static("uploads"))
+app.use("/api/upload", uploadRoutes)
+
+
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
 
 
-app.listen(port, ()=>{console.log("http://localhost:"+port)});
+
 
 
 

@@ -1,13 +1,9 @@
 
-export default function Card ({text, setText}) {
+export default function Card ({file}) {
     return(
-        <div className='hero container'>
-            <div className="hero-text">
-                <p>{text}</p>
-                <button className='btn' onClick={()=>{setText("Homie")}}>Explore more</button>
-                <button className='btn' onClick={()=>{setText("lol")}}>Explore more</button>
-            </div>
-        
+        <div className="card">
+            <img src={file.path} alt="Uploaded file" />
+            <p>{file.filename}</p>
         </div>
     )
 }

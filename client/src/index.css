@@ -86,3 +86,9 @@ header{
 
 
 }
+
+.Card{
+    background-color: rgb(129, 16, 144);
+    border: 1px solid black;
+  
+}

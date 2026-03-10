@@ -22,6 +22,7 @@ function App() {
       {page === 0 && <Home />}
       {page === 1 && <About />}
       {page === 2 && <Upload/>}
+      {page === 3 && <Cards />}
       
       <Footer></Footer>
       
@@ -49,7 +50,7 @@ function Header({page, setPage}){
           <button className="btn" onClick={()=>setPage(0)}>Home</button>
           <button className="btn" onClick={()=>setPage(1)}>About</button>
           <button className="btn" onClick={()=>setPage(2)}>Upload</button>
-          
+          <button className="btn" onClick={()=>setPage(3)}>Cards</button>
           
           
           
@@ -83,25 +84,36 @@ function Empty(){
 }
 
 
-function Cars(){
+function Cards(){
   useEffect(()=>{
-    getCars();
+    loadCards();
 
   },[])
 
-  const [cars, setCars] = useState(0);
+  const [cards, setCards] = useState([]);
 
-  async function getCars(){
+  async function loadCards(){
     const res = await fetch("/cars");
     const data = await res.json();
-    setCars(data);
+    setCards(data);
   }
 
-
+  
   return(
+    
     <div>
-      <h2>Cars</h2>
-      (JSON.stringify{cars})
+
+      {cards.map(card => (
+        <div className="Card" key={card.id}>
+          <h3>{card.brand} {card.model}</h3>
+          <p>Year: {card.year}</p>
+          <p>Price: {card.price}</p>
+          <button onClick={()=>{delCards(card.id)}}>Delete</button>
+        </div>
+      ))}
+
     </div>
   )
 }
+//https://www.youtube.com/watch?v=g8qhF_ggm30 20:38//
+//https://www.youtube.com/watch?v=YohZoBB0Bwk

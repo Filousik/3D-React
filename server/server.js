@@ -19,13 +19,8 @@ app.use("/api/upload", uploadRoutes)
 
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-
-
-
-
-
-
-const cars = [
+app.get("/cars", (req, res)=>{
+  const cars = [
   {
     id: "car_001",
     brand: "Toyota",
@@ -117,5 +112,14 @@ const cars = [
     condition: "Used"
   }
 ];
+
+
+  res.json(cars)
+
+})
+
+
+
+
 
 

@@ -5,14 +5,13 @@ import About from './components/About/About.jsx'
 import Home from './components/Home/Home.jsx'
 import Upload from './components/Upload/Upload.jsx'
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 
 
 function App() {
  const [page, setPage] = useState(0);
- const [cards, setCards] = useState([]);
-
+ 
  
 
   return (
@@ -56,6 +55,7 @@ function Header({page, setPage}){
           
 
      </nav>
+     
 
 
     </header>
@@ -83,3 +83,25 @@ function Empty(){
 }
 
 
+function Cars(){
+  useEffect(()=>{
+    getCars();
+
+  },[])
+
+  const [cars, setCars] = useState(0);
+
+  async function getCars(){
+    const res = await fetch("/cars");
+    const data = await res.json();
+    setCars(data);
+  }
+
+
+  return(
+    <div>
+      <h2>Cars</h2>
+      (JSON.stringify{cars})
+    </div>
+  )
+}

@@ -1,0 +1,59 @@
+[
+  {},
+  {
+    "id": "1",
+    "brand": "Ford",
+    "model": "Mustang",
+    "year": 2021,
+    "price": 45950,
+    "image": "/uploads/image1.jpeg"
+  },
+  {
+    "id": "2",
+    "brand": "Volvo",
+    "model": "XC60",
+    "year": 2023,
+    "price": 46995,
+    "image": "/uploads/image2.png"
+  },
+  {
+    "id": "3",
+    "brand": "Audi",
+    "model": "A4",
+    "year": 2022,
+    "price": 39900,
+    "image": "/uploads/audi_a4.jpg"
+  },
+  {
+    "id": "4",
+    "brand": "Mercedes",
+    "model": "C300",
+    "year": 2023,
+    "price": 42950,
+    "image": "/uploads/mercedes_c300.jpg"
+  },
+  {
+    "id": "5",
+    "brand": "Honda",
+    "model": "Civic",
+    "year": 2024,
+    "price": 24990,
+    "image": "/uploads/honda_civic.jpg"
+  },
+  {
+    "id": "6",
+    "brand": "Hyundai",
+    "model": "Ioniq 5",
+    "year": 2024,
+    "price": 44995,
+    "image": "/uploads/hyundai_ioniq5.jpg"
+  },
+  {
+    "id": "7",
+    "brand": "Porsche",
+    "model": "911 Carrera",
+    "year": 2022,
+    "price": 109000,
+    "image": "/uploads/porsche_911.jpg"
+  }
+]

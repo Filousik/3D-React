@@ -93,11 +93,22 @@ function Cards(){
   const [cards, setCards] = useState([]);
 
   async function loadCards(){
-    const res = await fetch("/cars");
+    const res = await fetch("/cards");
     const data = await res.json();
     setCards(data);
   }
 
+  async function delCards(id){
+   
+   const res = await fetch("/cards/"+ id,{
+    method: "DELETE"
+   })
+    const data = await res.json()
+    console.log(data)
+
+    setCards(cards.filter(card =>card.id !== id))
+    
+  }
   
   return(
     
@@ -108,6 +119,7 @@ function Cards(){
           <h3>{card.brand} {card.model}</h3>
           <p>Year: {card.year}</p>
           <p>Price: {card.price}</p>
+          <img src={card.image} />
           <button onClick={()=>{delCards(card.id)}}>Delete</button>
         </div>
       ))}

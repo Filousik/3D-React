@@ -3,11 +3,15 @@ import uploadRoutes from "./routes/upload.routes.js"
 import express from "express"
 import path from "path"
 import { fileURLToPath } from "url";
+import fs from "fs"
+import { json } from "stream/consumers";
+
 
 const app = express();
 const port = 1555;
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+const DATA_PATH = "./cards.json"
 
 app.listen(port, ()=>{console.log("http://localhost:"+port)});
 
@@ -19,110 +23,28 @@ app.use("/api/upload", uploadRoutes)
 
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-app.get("/cars", (req, res)=>{
-  const cars = [
-  {
-    id: "car_001",
-    brand: "Toyota",
-    model: "Corolla",
-    year: 2023,
-    price: 23995,
-    currency: "USD",
-    bodyType: "Sedan",
-    fuelType: "Petrol",
-    transmission: "Automatic",
-    engine: "2.0L I4",
-    horsepower: 169,
-    mileage: 12000,
-    color: "White",
-    doors: 4,
-    drivetrain: "FWD",
-    condition: "Used"
-  },
-  {
-    id: "car_002",
-    brand: "Tesla",
-    model: "Model 3",
-    year: 2024,
-    price: 38990,
-    currency: "USD",
-    bodyType: "Sedan",
-    fuelType: "Electric",
-    transmission: "Automatic",
-    engine: "Dual Motor",
-    horsepower: 283,
-    mileage: 5000,
-    color: "Black",
-    doors: 4,
-    drivetrain: "AWD",
-    condition: "Used"
-  },
-  {
-    id: "car_003",
-    brand: "BMW",
-    model: "X5",
-    year: 2022,
-    price: 52900,
-    currency: "USD",
-    bodyType: "SUV",
-    fuelType: "Diesel",
-    transmission: "Automatic",
-    engine: "3.0L I6",
-    horsepower: 335,
-    mileage: 22000,
-    color: "Blue",
-    doors: 5,
-    drivetrain: "AWD",
-    condition: "Used"
-  },
-  {
-    id: "car_004",
-    brand: "Ford",
-    model: "Mustang",
-    year: 2021,
-    price: 45950,
-    currency: "USD",
-    bodyType: "Coupe",
-    fuelType: "Petrol",
-    transmission: "Manual",
-    engine: "5.0L V8",
-    horsepower: 450,
-    mileage: 15000,
-    color: "Red",
-    doors: 2,
-    drivetrain: "RWD",
-    condition: "Used"
-  },
-  {
-    id: "car_005",
-    brand: "Volvo",
-    model: "XC60",
-    year: 2023,
-    price: 46995,
-    currency: "USD",
-    bodyType: "SUV",
-    fuelType: "Hybrid",
-    transmission: "Automatic",
-    engine: "2.0L I4 Hybrid",
-    horsepower: 455,
-    mileage: 8000,
-    color: "Silver",
-    doors: 5,
-    drivetrain: "AWD",
-    condition: "Used"
-  }
-];
+function getCards(){
+  const data = fs.readFileSync(DATA_PATH)
+  return JSON.parse(data)
+}
+
+function saveCards(cards){
+  fs.writeFileSync(DATA_PATH, JSON.stringify(cards, null, 2))
+}
 
 
-  res.json(cars)
+app.get("/cards", (req, res)=>{
+  const cards = getCards()
+  res.json(cards)
 
 })
 
-
-app.post("/create", (req,res)=>{
-
-  
-
+app.delete("/cards/:id", (req,res)=>{
+  const id = req.params.id
+  let cards = getCards()
+  cards = cards.filter(card=>card.id !== id)
+  saveCards(cards)
+  res.json({message:"Card deleted"})
 })
 
 

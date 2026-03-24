@@ -40,7 +40,7 @@ app.get("/cards", (req, res)=>{
 })
 
 app.delete("/cards/:id", (req,res)=>{
-  const id = req.params.id
+  const id = Number(req.params.id)
   let cards = getCards()
   cards = cards.filter(card=>card.id !== id)
   saveCards(cards)
@@ -50,4 +50,17 @@ app.delete("/cards/:id", (req,res)=>{
 
 
 
-
+app.post("/cards", (req, res) => {
+  const cards = getCards()
+  const newCard = {
+    id: Date.now(),
+    brand: req.body.brand,
+    model: req.body.model,
+    year: Number(req.body.year),
+    price: req.body.price,
+    image: req.body.image
+  }
+  cards.push(newCard)
+  saveCards(cards)
+  res.json(newCard)
+})

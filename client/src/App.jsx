@@ -31,11 +31,6 @@ function App() {
 }
 
 export default App
-function Button({page, onClick}){
-  return(
-    <button onClick={onClick}className="btn">Next page</button>
-  )
-}
 
 
 
@@ -76,39 +71,54 @@ function Footer(){
 }
 
 
-function Empty(){
-
-  return(
-    <div className="empty"></div>
-  )
-}
-
 
 function Cards(){
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(()=>{
     loadCards();
 
   },[])
 
-  const [cards, setCards] = useState([]);
+  
 
   async function loadCards(){
+    try {
     const res = await fetch("/cards");
     const data = await res.json();
     setCards(data);
+
+    } catch (err){
+      setError("Failed to load cards. Is the server running?");
+    } finally {
+      setLoading(false);
+    }
+    
   }
 
   async function delCards(id){
    
-   const res = await fetch("/cards/"+ id,{
+    try{
+    const res = await fetch("/cards/"+ id,{
     method: "DELETE"
    })
-    const data = await res.json()
-    console.log(data)
+    const data = await res.json();
+    console.log(data);
 
-    setCards(cards.filter(card =>card.id !== id))
+    setCards(cards.filter(card =>card.id !== id));
+
+
+    } catch (err) {
+      alert("Could not delete card, Try again");
+    }
+  
     
   }
+
+  if (loading) return <p>Loading cards</p>
+  if (error) return <p>{error}</p>;
   
   return(
     
@@ -127,5 +137,3 @@ function Cards(){
     </div>
   )
 }
-//https://www.youtube.com/watch?v=g8qhF_ggm30 20:38//
-//https://www.youtube.com/watch?v=YohZoBB0Bwk

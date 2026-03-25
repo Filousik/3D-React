@@ -1,58 +1,18 @@
 [
   {
-    "id": 3,
-    "brand": "Audi",
-    "model": "R8",
-    "year": 2020,
-    "price": "$142,000",
-    "image": "https://images.unsplash.com/photo-1502877338535-766e1452684a"
-  },
-  {
-    "id": 4,
-    "brand": "Mercedes-Benz",
-    "model": "C-Class",
-    "year": 2023,
-    "price": "$55,000",
-    "image": "https://images.unsplash.com/photo-1511919884226-fd3cad34687c"
-  },
-  {
-    "id": 5,
-    "brand": "Ford",
-    "model": "Mustang",
-    "year": 2019,
-    "price": "$35,000",
-    "image": "https://images.unsplash.com/photo-1493238792000-8113da705763"
-  },
-  {
-    "id": 6,
-    "brand": "Lamborghini",
-    "model": "Huracan",
-    "year": 2021,
-    "price": "$210,000",
-    "image": "https://images.unsplash.com/photo-1519245659620-e859806a8d3b"
-  },
-  {
-    "id": 7,
-    "brand": "Porsche",
-    "model": "911 Carrera",
-    "year": 2022,
-    "price": "$115,000",
-    "image": "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d"
-  },
-  {
-    "id": 1774355879805,
-    "brand": "BoberKurwa",
-    "model": "Bober S1",
-    "year": 2003,
-    "price": "0",
-    "image": "/uploads/1774355879788-79e9d7befdf50c3c6a977c43101496ee-3920324714.jpg"
-  },
-  {
     "id": 1774356009851,
     "brand": "test",
     "model": "test2",
     "year": null,
     "price": "test4",
     "image": "/uploads/1774356009838-79e9d7befdf50c3c6a977c43101496ee-3920324714.jpg"
+  },
+  {
+    "id": 1774441406592,
+    "brand": "",
+    "model": "",
+    "year": 0,
+    "price": "",
+    "image": "/uploads/1774441406525-BrownSpiderMonkey_(edit2).jpg"
   }
 ]

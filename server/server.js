@@ -4,7 +4,7 @@ import express from "express"
 import path from "path"
 import { fileURLToPath } from "url";
 import fs from "fs"
-import { json } from "stream/consumers";
+
 
 
 const app = express();
@@ -23,44 +23,66 @@ app.use("/api/upload", uploadRoutes)
 
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
-function getCards(){
-  const data = fs.readFileSync(DATA_PATH)
+async function getCards(){
+  try{
+  const data = await fs.promises.readFile(DATA_PATH)
   return JSON.parse(data)
+  } catch (err){
+    //Om filen inte finns returneras tom array
+    return [];
+  }
+  
 }
 
-function saveCards(cards){
-  fs.writeFileSync(DATA_PATH, JSON.stringify(cards, null, 2))
+async function saveCards(cards){
+  await fs.promises.writeFile(DATA_PATH, JSON.stringify(cards, null, 2))
 }
 
 
-app.get("/cards", (req, res)=>{
-  const cards = getCards()
+app.get("/cards", async (req, res)=>{
+  try{
+  const cards = await getCards()
   res.json(cards)
-
+  } catch(err){
+    res.status(500).json({message: "Failed to delete card"})
+  }
+ 
 })
 
-app.delete("/cards/:id", (req,res)=>{
+app.delete("/cards/:id", async (req,res)=>{
   const id = Number(req.params.id)
-  let cards = getCards()
+  let cards = await getCards()
   cards = cards.filter(card=>card.id !== id)
-  saveCards(cards)
+  await saveCards(cards)
   res.json({message:"Card deleted"})
 })
 
 
 
 
-app.post("/cards", (req, res) => {
-  const cards = getCards()
+app.post("/cards", async (req, res) => {
+  try{
+    const {brand, model, year, price, image} = req.body;
+
+    if(!brand|| !model || !year || !price){
+      return res.status(400).json({message:"Missing required fields"});
+    }
+  
+
+
+  const cards = await getCards()
   const newCard = {
     id: Date.now(),
-    brand: req.body.brand,
-    model: req.body.model,
-    year: Number(req.body.year),
-    price: req.body.price,
-    image: req.body.image
-  }
+    brand, 
+    model, 
+    year: Number(year),
+    price: Number(price), 
+    image: image || ""
+  };
   cards.push(newCard)
-  saveCards(cards)
+  await saveCards(cards)
   res.json(newCard)
-})
+  } catch(err){
+    res.status(500).json({message:"Failed to save card"})
+  }
+});

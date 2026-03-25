@@ -1,18 +1,10 @@
 [
   {
-    "id": 1774356009851,
-    "brand": "test",
-    "model": "test2",
-    "year": null,
-    "price": "test4",
-    "image": "/uploads/1774356009838-79e9d7befdf50c3c6a977c43101496ee-3920324714.jpg"
-  },
-  {
-    "id": 1774441406592,
-    "brand": "",
-    "model": "",
-    "year": 0,
-    "price": "",
-    "image": "/uploads/1774441406525-BrownSpiderMonkey_(edit2).jpg"
+    "id": 1774448086471,
+    "brand": "test3",
+    "model": "test3",
+    "year": 3,
+    "price": 3,
+    "image": "/uploads/1774448086442-BrownSpiderMonkey_(edit2).jpg"
   }
 ]

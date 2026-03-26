@@ -48,6 +48,24 @@ async function saveCards(cards){
   await fs.promises.writeFile(DATA_PATH, JSON.stringify(cards, null, 2))
 }
 
+async function getUsers(){
+  try {
+
+
+    const data = await fs.promises.readFile(USERS_PATH, "utf-8");
+    return JSON.parse(data)
+
+  } catch(err){
+    return [];
+
+  }
+}
+async function saveUsers(users){
+    await fs.promises.writeFile(USERS_PATH, JSON.stringify(users,null,2));
+
+
+}   
+
 
 app.get("/cards", async (req, res)=>{
   try{
@@ -96,6 +114,42 @@ app.delete("/cards/:id", async (req,res)=>{
 })
 
 
+app.get("/users", async (req,res)=>{
+const data = await getUsers()
+res.json(data)
+
+})
+
+
+app.post("/auth/register", async (req,res)=>{
+  try{
+    const {username, password} = req.body;
+    if(!username || !password) {
+      return res.status(400).json({message:"Username and password required"});
+
+    }
+    const users = await getUsers();
+    const exists = users.find(u=>u.username === username);
+    if(exists){
+      return res.status(400).json({message: "Username already taken"});
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = {
+      id: Date.now(),
+      username,
+      password: hashedPassword
+
+    };
+    users.push(newUser)
+    await saveUsers(users)
+    res.json({message:"Account created"})
+
+
+  }catch(err){
+    res.status(500).json({message:"Registration failed"});
+  }
+})
+
 
 
 app.post("/cards", async (req, res) => {
@@ -124,4 +178,6 @@ app.post("/cards", async (req, res) => {
     res.status(500).json({message:"Failed to save card"})
   }
 });
+
+
 

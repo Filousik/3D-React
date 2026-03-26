@@ -23,6 +23,7 @@ function App() {
       {page === 1 && <About />}
       {page === 2 && <Upload/>}
       {page === 3 && <Cards />}
+      {page === 4 && <TestRegister />}
       
       <Footer></Footer>
       
@@ -46,6 +47,7 @@ function Header({page, setPage}){
           <button className="btn" onClick={()=>setPage(1)}>About</button>
           <button className="btn" onClick={()=>setPage(2)}>Upload</button>
           <button className="btn" onClick={()=>setPage(3)}>Cards</button>
+          <button className="btn" onClick={()=>setPage(4)}>Register</button>
           
           
           
@@ -137,3 +139,5 @@ function Cards(){
     </div>
   )
 }
+
+

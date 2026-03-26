@@ -151,6 +151,42 @@ app.post("/auth/register", async (req,res)=>{
 })
 
 
+app.post("/auth/login", async (req,res)=>{
+
+  try{
+    const {username, password} = req.body
+    const users = await getUsers();
+    const user = users.find(u=>u.username === username);
+
+    if(!user) {
+      return res.status(400).json({message:"Invalid username or password"});
+    }
+    const match = await bcrypt.compare(password, user.password);
+    if(!match){
+      return res.status(400).json({message:"Invalid username or passwword"});
+    }
+    req.session.user = {id: user.id, username: user.username};
+    res.json({message:"Logged in", username: user.username});
+  }catch(err){
+    res.status(500).json({message:"Login failed"})
+  }
+});
+
+app.post("/auth/logout", (req,res)=>{
+  req.session.destroy();
+  res.json({message:"Logged out"});
+
+});
+
+app.get("/auth/me", (req,res)=>{
+  if (req.session.user){
+    res.json(req.session.user);
+
+  } else {
+    res.status(401).json({message: "Not logged in"})
+  }
+})
+
 
 app.post("/cards", async (req, res) => {
   try{

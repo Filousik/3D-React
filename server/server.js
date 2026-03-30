@@ -84,7 +84,7 @@ app.delete("/cards/:id", async (req,res)=>{
     const id = Number(req.params.id)
     let cards = await getCards()
 
-    const card = cards.find(card=>card.id === id);
+    const card = cards.find(card=>card.id == id);
     if(!card){
       return res.status(404).json({message:"Card not found"});
     }
@@ -129,7 +129,7 @@ app.post("/auth/register", async (req,res)=>{
 
     }
     const users = await getUsers();
-    const exists = users.find(u=>u.username === username);
+    const exists = users.find(u=>u.username == username);
     if(exists){
       return res.status(400).json({message: "Username already taken"});
     }
@@ -156,7 +156,7 @@ app.post("/auth/login", async (req,res)=>{
   try{
     const {username, password} = req.body
     const users = await getUsers();
-    const user = users.find(u=>u.username === username);
+    const user = users.find(u=>u.username == username);
 
     if(!user) {
       return res.status(400).json({message:"Invalid username or password"});

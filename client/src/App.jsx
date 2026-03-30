@@ -6,6 +6,8 @@ import Home from './components/Home/Home.jsx'
 import Upload from './components/Upload/Upload.jsx'
 
 import React, { useEffect, useState } from "react"
+import { AuthProvider, useAuth } from './context/AuthContext.jsx'
+import AuthModal from './components/AuthModal/AuthModal.jsx'
 
 
 
@@ -15,19 +17,21 @@ function App() {
  
 
   return (
+    <AuthProvider>
     <>
       
       <Header page={page} setPage={setPage}></Header>
 
-      {page === 0 && <Home />}
-      {page === 1 && <About />}
-      {page === 2 && <Upload/>}
-      {page === 3 && <Cards />}
-      {page === 4 && <TestRegister />}
+      {page == 0 && <Home />}
+      {page == 1 && <About />}
+      {page == 2 && <Upload/>}
+      {page == 3 && <Cards />}
+      
       
       <Footer></Footer>
       
     </>
+    </AuthProvider>
   )
 }
 
@@ -37,6 +41,10 @@ export default App
 
 
 function Header({page, setPage}){
+  const {user, logout} = useAuth();
+
+  const [showModal, setShowModal] = useState(false);
+
   return(
     <header>
       
@@ -47,13 +55,24 @@ function Header({page, setPage}){
           <button className="btn" onClick={()=>setPage(1)}>About</button>
           <button className="btn" onClick={()=>setPage(2)}>Upload</button>
           <button className="btn" onClick={()=>setPage(3)}>Cards</button>
-          <button className="btn" onClick={()=>setPage(4)}>Register</button>
+          
+
+         {user ? (
+          <>
+            <span>Hi, {user.username}</span>
+            <button className="btn" onClick={logout}>Logout</button>
+          </>
+        ) : (
+          <button className="btn" onClick={() => setShowModal(true)}>
+            Sign in/Up
+          </button>
+        )}
           
           
           
 
      </nav>
-     
+     {showModal && <AuthModal onClose={() => setShowModal(false)} />}
 
 
     </header>

@@ -86,15 +86,14 @@ export default function AuthModal({onClose}){
           onKeyDown={handleEnter}
         />
 
-        {/* Renderas bara vid fel */}
-        {error && <p className="modal-error">{error}</p>}
+        
 
         <button
           className="btn modal-submit"
           onClick={handleSubmit}
           disabled={loading}
         >
-          
+        {tab == "login" ? "Login":"Register"}  
         </button>
 
       </div>

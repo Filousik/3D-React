@@ -57,9 +57,9 @@ function Header({page, setPage}){
           <button className="btn" onClick={()=>setPage(3)}>Cards</button>
           
 
-         {user ? (
+         {user ? ( /*Om användare finns/aktiv så visas username idiv och logout knapp annars visas modal när man trycker på signin knappen*/
           <>
-            <span>Hi, {user.username}</span>
+            
             <button className="btn" onClick={logout}>Logout</button>
           </>
         ) : (
@@ -144,6 +144,7 @@ function Cards(){
   return(
     
     <div>
+      
 
       {cards.map(card => (
         <div className="Card" key={card.id}>

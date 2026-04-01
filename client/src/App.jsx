@@ -97,6 +97,7 @@ function Cards(){
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   useEffect(()=>{
     loadCards();
@@ -151,8 +152,10 @@ function Cards(){
           <h3>{card.brand} {card.model}</h3>
           <p>Year: {card.year}</p>
           <p>Price: {card.price}</p>
+          
           <img src={card.image} />
-          <button onClick={()=>{delCards(card.id)}}>Delete</button>
+           {user && (user.id == card.ownerId || user.role === "admin") && (
+            <button onClick={() => delCards(card.id)}>Delete</button>)}
         </div>
       ))}
 

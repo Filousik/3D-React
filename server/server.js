@@ -33,6 +33,23 @@ app.use("/api/upload", uploadRoutes)
 
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
+function loginAuth(req,res,next){
+  if (!req.session.user){
+    return res.status(401).json({message:"You must be logged in mate"})
+  }
+  next();
+}
+
+
+function adminAuth(req,res,next){
+  if (!req.session.user){
+    return res.status(401).json({message:"You must be logged in"});
+  }
+  if (req.session.user.role !== "admin"){
+    return res.status(403).json({message:"Admins only"});
+  }
+  next();
+}
 async function getCards(){
   try{
   const data = await fs.promises.readFile(DATA_PATH)
@@ -77,7 +94,7 @@ app.get("/cards", async (req, res)=>{
  
 })
 
-app.delete("/cards/:id", async (req,res)=>{
+app.delete("/cards/:id",loginAuth, async (req,res)=>{
 
   try{
 
@@ -88,6 +105,13 @@ app.delete("/cards/:id", async (req,res)=>{
     if(!card){
       return res.status(404).json({message:"Card not found"});
     }
+
+   const isOwwner = card.ownerId === req.session.user.id;
+   const isAdmin = req.session.user.role === "admin";
+   if (!isOwwner && !isAdmin ){
+    return res.status(403).json({message:"You may only delete your own"});
+   }
+
    if(card.image){
     const imagePath = path.join(__dirname,card.image);
     try{
@@ -97,7 +121,8 @@ app.delete("/cards/:id", async (req,res)=>{
       console.log("Image file not found, skpping:", imagePath)
     }
    } 
- 
+
+   
  
 
 
@@ -114,7 +139,7 @@ app.delete("/cards/:id", async (req,res)=>{
 })
 
 
-app.get("/users", async (req,res)=>{
+app.get("/users", adminAuth, async (req,res)=>{
 const data = await getUsers()
 res.json(data)
 
@@ -137,7 +162,8 @@ app.post("/auth/register", async (req,res)=>{
     const newUser = {
       id: Date.now(),
       username,
-      password: hashedPassword
+      password: hashedPassword,
+      role: "user"
 
     };
     users.push(newUser)
@@ -165,8 +191,8 @@ app.post("/auth/login", async (req,res)=>{
     if(!match){
       return res.status(400).json({message:"Invalid username or passwword"});
     }
-    req.session.user = {id: user.id, username: user.username};
-    res.json({message:"Logged in", username: user.username});
+    req.session.user = {id: user.id, username: user.username, role: user.role};
+    res.json({message:"Logged in", username: user.username, role: user.role});
   }catch(err){
     res.status(500).json({message:"Login failed"})
   }
@@ -188,7 +214,7 @@ app.get("/auth/me", (req,res)=>{
 })
 
 
-app.post("/cards", async (req, res) => {
+app.post("/cards", loginAuth, async (req, res) => {
   try{
     const {brand, model, year, price, image} = req.body;
 
@@ -205,7 +231,9 @@ app.post("/cards", async (req, res) => {
     model, 
     year: Number(year),
     price: Number(price), 
-    image: image || ""
+    image: image || "",
+    ownerId: req.session.user.id,
+    ownerName: req.session.user.username
   };
   cards.push(newCard)
   await saveCards(cards)

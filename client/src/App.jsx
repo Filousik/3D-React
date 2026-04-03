@@ -1,9 +1,7 @@
 import './App.css'
 import About from './components/About/About.jsx'
 import Home from './components/Home/Home.jsx'
-import Upload from './components/Upload/Upload.jsx'
-
-import React, { useEffect, useState } from "react"
+import { useState } from "react"
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import AuthModal from './components/AuthModal/AuthModal.jsx'
 import { CardProvider, useCards } from './context/UploadContext.jsx'
@@ -12,7 +10,15 @@ import UploadModal from './components/UploadModal/UploadModal.jsx'
 
 
 function App() {
- const [page, setPage] = useState(0);
+ const [page, setPage] = useState(()=>{
+  const saved = sessionStorage.getItem("page");
+  return saved ? Number(saved) : 0;
+ })
+
+ function handleSetPage(newPage){
+  setPage(newPage);
+  sessionStorage.setItem("page",newPage);
+ }
  
  
 
@@ -21,11 +27,10 @@ function App() {
       <CardProvider>
       <>
         
-        <Header page={page} setPage={setPage}></Header>
+        <Header page={page} setPage={handleSetPage}></Header>
 
         {page == 0 && <Home />}
         {page == 1 && <About />}
-        {page == 2 && <Upload/>}
         {page == 3 && <Cards />}
         
         

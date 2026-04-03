@@ -1,6 +1,4 @@
 import './App.css'
-import Hero from './components/Hero/Hero'
-import Card from './components/Card/Card.jsx'
 import About from './components/About/About.jsx'
 import Home from './components/Home/Home.jsx'
 import Upload from './components/Upload/Upload.jsx'
@@ -8,6 +6,8 @@ import Upload from './components/Upload/Upload.jsx'
 import React, { useEffect, useState } from "react"
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import AuthModal from './components/AuthModal/AuthModal.jsx'
+import { CardProvider, useCards } from './context/UploadContext.jsx'
+import UploadModal from './components/UploadModal/UploadModal.jsx'
 
 
 
@@ -18,19 +18,21 @@ function App() {
 
   return (
     <AuthProvider>
-    <>
-      
-      <Header page={page} setPage={setPage}></Header>
+      <CardProvider>
+      <>
+        
+        <Header page={page} setPage={setPage}></Header>
 
-      {page == 0 && <Home />}
-      {page == 1 && <About />}
-      {page == 2 && <Upload/>}
-      {page == 3 && <Cards />}
-      
-      
-      <Footer></Footer>
-      
-    </>
+        {page == 0 && <Home />}
+        {page == 1 && <About />}
+        {page == 2 && <Upload/>}
+        {page == 3 && <Cards />}
+        
+        
+        <Footer></Footer>
+        
+      </>
+      </CardProvider>
     </AuthProvider>
   )
 }
@@ -42,7 +44,8 @@ export default App
 
 function Header({page, setPage}){
   const {user, logout} = useAuth();
-
+  
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   return(
@@ -53,13 +56,12 @@ function Header({page, setPage}){
           <img src="" alt="" className='logo' />
           <button className="btn" onClick={()=>setPage(0)}>Home</button>
           <button className="btn" onClick={()=>setPage(1)}>About</button>
-          <button className="btn" onClick={()=>setPage(2)}>Upload</button>
           <button className="btn" onClick={()=>setPage(3)}>Cards</button>
           
 
          {user ? ( /*Om användare finns/aktiv så visas username idiv och logout knapp annars visas modal när man trycker på signin knappen*/
           <>
-            
+            <button className="btn" onClick={()=> setShowUploadModal(true)}>Upload</button>
             <button className="btn" onClick={logout}>Logout</button>
           </>
         ) : (
@@ -73,6 +75,7 @@ function Header({page, setPage}){
 
      </nav>
      {showModal && <AuthModal onClose={() => setShowModal(false)} />}
+     {showUploadModal && <UploadModal onClose={() => setShowUploadModal(false)} />}
 
 
     </header>
@@ -94,73 +97,30 @@ function Footer(){
 
 
 function Cards(){
-  const [cards, setCards] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {cards, loading, error, delCard} = useCards();
   const { user } = useAuth();
 
-  useEffect(()=>{
-    loadCards();
-
-  },[])
-
-  
-
-  async function loadCards(){
-    try {
-    const res = await fetch("/cards");
-    const data = await res.json();
-    setCards(data);
-
-    } catch (err){
-      setError("Failed to load cards. Is the server running?");
-    } finally {
-      setLoading(false);
-    }
-    
-  }
-
-  async function delCards(id){
-   
-    try{
-    const res = await fetch("/cards/"+ id,{
-    method: "DELETE"
-   })
-    const data = await res.json();
-    console.log(data);
-
-    setCards(cards.filter(card =>card.id !== id));
-
-
-    } catch (err) {
-      alert("Could not delete card, Try again");
-    }
-  
-    
-  }
 
   if (loading) return <p>Loading cards</p>
-  if (error) return <p>{error}</p>;
-  
-  return(
-    
-    <div>
-      
+  if (error) return <p> {error} </p>
 
-      {cards.map(card => (
-        <div className="Card" key={card.id}>
-          <h3>{card.brand} {card.model}</h3>
-          <p>Year: {card.year}</p>
-          <p>Price: {card.price}</p>
-          
-          <img src={card.image} />
-           {user && (user.id == card.ownerId || user.role === "admin") && (
-            <button onClick={() => delCards(card.id)}>Delete</button>)}
+  return (
+     <div className="cards-grid">
+            {cards.map(card => (
+                <div className="Card" key={card.id}>
+                    <img src={card.image} alt={`${card.brand} ${card.model}`} />
+                    <h3>{card.brand} {card.model}</h3>
+                    <p>Year: {card.year}</p>
+                    <p>Price: {card.price}</p>
+                    <p>Added by {card.ownerName}</p>
+                    {user && (user.id == card.ownerId || user.role === "admin") && (
+                        <button onClick={() => delCard(card.id)}>Delete</button>
+                    )}
+                </div>
+            ))}
         </div>
-      ))}
-
-    </div>
-  )
+    )
 }
+
 
 

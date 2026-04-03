@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import {useAuth} from "./AuthContext";
 
 
 
@@ -8,10 +9,11 @@ export function CardProvider({children}){
     const [cards, setCards] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const {user} = useAuth();
 
     useEffect(()=>{
         loadCards();
-    }, []);
+    }, [user]);
 
 
 
@@ -43,7 +45,7 @@ async function addCard(brand, model, year, price, image){
         });
         if (!uploadRes.ok) throw new Error("Upload failed");
         const uploadData = await uploadRes.json();
-        imagePath = uploadData.path;
+        imagePath = uploadData.image;
 
     }
 

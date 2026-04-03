@@ -192,7 +192,7 @@ app.post("/auth/login", async (req,res)=>{
       return res.status(400).json({message:"Invalid username or passwword"});
     }
     req.session.user = {id: user.id, username: user.username, role: user.role};
-    res.json({message:"Logged in", username: user.username, role: user.role});
+    res.json({message:"Logged in", id: user.id, username: user.username, role: user.role});
   }catch(err){
     res.status(500).json({message:"Login failed"})
   }

@@ -63,6 +63,41 @@ async function addCard(brand, model, year, price, image){
     return newCard;
 }
 
+async function updateCard(id, brand, model, year, price, image){
+    let imagePath = null; // Om ingen bild laddas up ändra inte//
+    
+
+    if (image && typeof image !== "string"){
+        const formData = new FormData();
+        formData.append("image", image);
+        const uploadRes = await fetch("/api/upload",{
+            method:"POST",
+            body: formData
+        });
+        if (!uploadRes.ok) throw new Error("Image upload failed");
+        const uploadData = await uploadRes.json();
+        imagePath = uploadData.image;
+    }
+
+    const res = await fetch("/cards/"+ id,{
+        method:"PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            brand,
+            model,
+            year,
+            price,
+            image: imagePath || undefined
+    })
+});
+
+
+    const updatedCard = await res.json();
+    setCards(prev=>prev.map(c=>c.id == id ? updatedCard : c));
+    return updatedCard;
+
+}
+
 async function delCard(id){
     const res = await fetch("/cards/"+id, {method:"DELETE"});
     if (!res.ok){
@@ -72,7 +107,7 @@ async function delCard(id){
     setCards(prev => prev.filter(card => card.id !== id));
 }
 return(
-    <UploadContext.Provider value={{cards,loading,error,addCard,delCard}}>
+    <UploadContext.Provider value={{cards,loading,error,addCard,delCard, updateCard}}>
         {children}
     </UploadContext.Provider>
 );

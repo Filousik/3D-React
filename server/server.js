@@ -214,6 +214,40 @@ app.get("/auth/me", (req,res)=>{
 })
 
 
+
+app.patch("/cards/:id", loginAuth, async (req,res)=>{
+  try{
+    const id = Number(req.params.id);
+    let cards = await getCards();
+
+    const card = cards.find(card=> card.id == id);
+    if (!card) {
+      return res.status(404).json({message:"Card not found"});
+    }
+    const isOwner = card.ownerId === req.session.user.id
+    const isAdmin = req.session.user.role == "admin";
+    if (!isOwner && !isAdmin){
+      return res.status(403).json({message: "You may only edit your own card"});
+    }
+
+    const { brand, model, year, price, image } = req.body;
+
+    if (brand) card.brand = brand;
+    if (model) card.model = model;
+    if (year) card.year = Number(year);
+    if (price) card.price = Number(price);
+    if (image) card.image = image;
+
+    cards = cards.map(c => c.id == id ? card : c);
+    await saveCards(cards);
+    res.json(card)
+  }catch(err){
+    res.status(500).json({message: "Failed to update"})
+  }
+});
+
+
+
 app.post("/cards", loginAuth, async (req, res) => {
   try{
     const {brand, model, year, price, image} = req.body;

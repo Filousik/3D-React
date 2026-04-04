@@ -1,17 +1,19 @@
+
 import { useState } from "react";
 import { useCards } from "../../context/UploadContext";
 import "../UploadModal.css";
 
-export default function UploadModal({ onClose }) {
-    const [brand, setBrand] = useState("");
-    const [model, setModel] = useState("");
-    const [year, setYear] = useState("");
-    const [price, setPrice] = useState("");
-    const [image, setImage] = useState(null);
+export default function EditModal({ card, onClose }) {
+    
+    const [brand, setBrand] = useState(card.brand);
+    const [model, setModel] = useState(card.model);
+    const [year, setYear] = useState(card.year);
+    const [price, setPrice] = useState(card.price);
+    const [image, setImage] = useState(null); 
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const { addCard } = useCards();
+    const { updateCard } = useCards();
 
     async function handleSubmit() {
         setError(null);
@@ -23,9 +25,9 @@ export default function UploadModal({ onClose }) {
 
         setLoading(true);
         try {
-            await addCard(brand, model, year, price, image);
+            await updateCard(card.id, brand, model, year, price, image);
             onClose();
-        } catch (err) {
+        } catch(err) {
             setError(err.message);
         } finally {
             setLoading(false);
@@ -41,7 +43,7 @@ export default function UploadModal({ onClose }) {
             <div className="modal" onClick={e => e.stopPropagation()}>
 
                 <button className="modal-close" onClick={onClose}>✕</button>
-                <h2>Add a card</h2>
+                <h2>Edit card</h2>
 
                 <input
                     type="text"
@@ -71,11 +73,25 @@ export default function UploadModal({ onClose }) {
                     onChange={e => setPrice(e.target.value)}
                     onKeyDown={handleEnter}
                 />
+
+               
+                {card.image && (
+                    <div>
+                        <p>Current image:</p>
+                        <img
+                            src={card.image}
+                            alt="current"
+                            style={{ width: "100%", height: "120px", objectFit: "cover", borderRadius: "8px" }}
+                        />
+                    </div>
+                )}
+
                 <input
                     type="file"
                     accept="image/*"
                     onChange={e => setImage(e.target.files[0])}
                 />
+                
 
                 {error && <p className="modal-error">{error}</p>}
 
@@ -84,7 +100,7 @@ export default function UploadModal({ onClose }) {
                     onClick={handleSubmit}
                     disabled={loading}
                 >
-                    {loading ? "Uploading..." : "Add card"}
+                    {loading ? "Saving..." : "Save changes"}
                 </button>
 
             </div>

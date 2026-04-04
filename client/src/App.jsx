@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import AuthModal from './components/AuthModal/AuthModal.jsx'
 import { CardProvider, useCards } from './context/UploadContext.jsx'
 import UploadModal from './components/UploadModal/UploadModal.jsx'
+import EditModal from './components/EditModal/EditModal.jsx'
 
 
 
@@ -104,12 +105,14 @@ function Footer(){
 function Cards(){
   const {cards, loading, error, delCard} = useCards();
   const { user } = useAuth();
+  const [editingCard, setEditingCard] = useState(null);
 
 
   if (loading) return <p>Loading cards</p>
   if (error) return <p> {error} </p>
 
-  return (
+
+return (
      <div className="cards-grid">
             {cards.map(card => (
                 <div className="Card" key={card.id}>
@@ -119,13 +122,24 @@ function Cards(){
                     <p>Price: {card.price}</p>
                     <p>Added by {card.ownerName}</p>
                     {user && (user.id == card.ownerId || user.role === "admin") && (
-                        <button onClick={() => delCard(card.id)}>Delete</button>
+                       <>
+                      <button onClick={() => setEditingCard(card)}>Edit</button>
+                      <button onClick={() => delCard(card.id)}>Delete</button>
+                       
+                       </>
+                        
                     )}
                 </div>
             ))}
-        </div>
-    )
-}
 
+        {editingCard && (
+          <EditModal
+          card={editingCard}
+          onClose={()=> setEditingCard(null)}
+          />
+        )}
+        </div>
+  )
+}
 
 

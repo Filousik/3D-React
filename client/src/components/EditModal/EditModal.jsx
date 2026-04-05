@@ -77,7 +77,7 @@ export default function EditModal({ card, onClose }) {
                
                 {card.image && (
                     <div>
-                        <p>Current image:</p>
+                        <p className="Cimage">Current image:</p>
                         <img
                             src={card.image}
                             alt="current"

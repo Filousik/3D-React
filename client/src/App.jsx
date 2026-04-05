@@ -16,6 +16,10 @@ function App() {
   return saved ? Number(saved) : 0;
  })
 
+
+ const [showUploadModal, setShowUploadModal] = useState(false);
+ const [showModal, setShowModal] = useState(false);
+
  function handleSetPage(newPage){
   setPage(newPage);
   sessionStorage.setItem("page",newPage);
@@ -28,7 +32,10 @@ function App() {
       <CardProvider>
       <>
         
-        <Header page={page} setPage={handleSetPage}></Header>
+        <Header page={page}
+        setPage={handleSetPage}
+        setShowModal={setShowModal}
+        setShowUploadModal={setShowUploadModal}></Header>
 
         {page == 0 && <Home />}
         {page == 1 && <About />}
@@ -36,6 +43,8 @@ function App() {
         
         
         <Footer></Footer>
+        {showModal && <AuthModal onClose={() => setShowModal(false)} />}
+        {showUploadModal && <UploadModal onClose={() => setShowUploadModal(false)} />}
         
       </>
       </CardProvider>
@@ -48,11 +57,10 @@ export default App
 
 
 
-function Header({page, setPage}){
+function Header({page, setPage, setShowModal, setShowUploadModal}){
   const {user, logout} = useAuth();
   
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  
 
   return(
     <header>
@@ -80,8 +88,7 @@ function Header({page, setPage}){
           
 
      </nav>
-     {showModal && <AuthModal onClose={() => setShowModal(false)} />}
-     {showUploadModal && <UploadModal onClose={() => setShowUploadModal(false)} />}
+     
 
 
     </header>

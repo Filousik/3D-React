@@ -69,7 +69,7 @@ export default function AuthModal({onClose}){
         </div>
 
         {/* title changes based on which tab is active */}
-        <h2>{tab == "login" ? "Welcome back" : "Create account"}</h2>
+        <h2>{tab == "login" ? "Welcome" : "Create account"}</h2>
 
         <input
           type="text"

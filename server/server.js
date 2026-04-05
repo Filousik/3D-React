@@ -1,4 +1,4 @@
-//*Test*//
+
 import uploadRoutes from "./routes/upload.routes.js"
 import express from "express"
 import path from "path"
@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import fs from "fs"
 import session from "express-session"
 import bcrypt from "bcrypt"
-import { writeFile } from "fs/promises";
+
 
 
 
@@ -122,11 +122,6 @@ app.delete("/cards/:id",loginAuth, async (req,res)=>{
     }
    } 
 
-   
- 
-
-
-  
   cards = cards.filter(card=>card.id !== id)
   await saveCards(cards)
   res.json({message:"Card deleted"})

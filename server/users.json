@@ -28,5 +28,24 @@
     "username": "555",
     "password": "$2b$10$TP40J75bRJXjBu53lxN7Ve3c6L9dPEXeiIGG4Lu/G4Qge3M63XEIO",
     "role": "user"
+  },
+ 
+  {
+    "id": 1775412419879,
+    "username": "Noor",
+    "password": "$2b$10$rvYiKJQYtzp2UK7SHKwky.mYTwm2h1Zg6eG0zsZ03KvjmAV699BKa",
+    "role": "user"
+  },
+  {
+    "id": 1775412442426,
+    "username": "22",
+    "password": "$2b$10$ypQOJYuLmDMfXEfktS2xOeqNvNRM/b1N3UKJT0bOaHFiuYtzs44NW",
+    "role": "user"
+  },
+  {
+    "id": 1775422999750,
+    "username": "milker",
+    "password": "$2b$10$BjYr8tTP6ZUIDEIRH1LLpOPRpWorFF2ed5qnSxkoYGy4CnoQ9jP4u",
+    "role": "user"
   }
 ]

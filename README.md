@@ -467,10 +467,54 @@ kräver att input fältet heter "image". Efter multer körs req.file som innehå
 
 # Frontend - React 
 
-App.jsx
-main.jsx
-About.jsx
-Home.jsx
+## React, Vad är det och varför?
+React är ett av flera javascript bibliotek för att bygga frontend. Istället för att hålla på med HTML direkt så bygger man komponenter vilket är återanvändbara funktioner som returnerar jsx (en blandning av javascript och HTML liknande syntax alltså språk regler.) React håller koll på när data ändras och uppdaterar där med bara de delar av sidan som behöver ändras istället för att ladda om allting på sidan för minsta lilla.
+
+
+## main.jsx - Roten för React
+```jsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+```
+main.jsx körs först och kopplar React till HTML-sidan som används i projektet. I index.html finns en div med id="root":. document.getElementById("root") hittar html diven med id root i webbläsaren. Medan createRoot() tar över diven och säger till React att allting ska renderas inuti den. .render() sätter igång rendering med App komponenten som rot och allt annat renderas inuti App.
+
+Strictmode är bara ett utvecklingsverktyg som kör vissa saker dubbelt för att hitta buggar tidigt vilket bara används under utveckling. import './index.css' laddar bara den globala css filen som gäller för hela applikationen.
+
+## Komponenter och Props
+För att förstå hur react fungerar i mitt projekt kan det vara bra att veta vad Komponenter och props är. Komponenter är en funktioner som returnerar jsx. React anropar de funktionerna för att bygga upp sidan på klienten. T.ex min home sida är en funktion i en folder med en Home.jsx som jag exporterar: 
+```jsx
+export default function Home(){
+   return(
+    <main className="Home">
+        This is home page homeboy
+    </main>
+   )
+}
+
+```
+```jsx
+import Home from './components/Home/Home.jsx'
+```
+Jag importerar komponenten i toppen av App.jsx för att sedan kunna använda den. Props däremot är argument som skickas till en komponent vilka är exakt som argument man skickar till en vanlig funktion. T.ex:
+```jsx
+function Header({page, setPage, setShowModal, setShowUploadModal})
+```
+Ett problem med detta kan uppstå när det blir alldeles för många funktioner att skicka props igenom t.ex om jag har Header med en nav och en button i nav som behöver t.ex page. Då måste jag skicka vidare propertyn page via header och sedan nav för att button ska kunna använda den. Context löser detta genom att dela data globalt utan det här då vilken komponent som helst oavsett ordningen det är uppbyggt i ska kunna läsa data direkt från kontexten.
+
+## App.jsx
+
+App.jsx Nästa
+main.jsx klar
+About.jsx Simpel komponent
+Home.jsx Simpel komponent
 Card.jsx
 UploadModal.jsx
 AuthModal.jsx

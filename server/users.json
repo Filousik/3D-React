@@ -29,7 +29,6 @@
     "password": "$2b$10$TP40J75bRJXjBu53lxN7Ve3c6L9dPEXeiIGG4Lu/G4Qge3M63XEIO",
     "role": "user"
   },
- 
   {
     "id": 1775412419879,
     "username": "Noor",
@@ -46,6 +45,24 @@
     "id": 1775422999750,
     "username": "milker",
     "password": "$2b$10$BjYr8tTP6ZUIDEIRH1LLpOPRpWorFF2ed5qnSxkoYGy4CnoQ9jP4u",
+    "role": "user"
+  },
+  {
+    "id": 1775489763870,
+    "username": "Elliot",
+    "password": "$2b$10$viJuXblcZsWvjkknPSBrCuYpkVJTnH.rTmn6Y9asIo.tZbYLNSo5C",
+    "role": "user"
+  },
+  {
+    "id": 1775489928328,
+    "username": "nytt",
+    "password": "$2b$10$N.YGqdJ55haNhVgZi2MiCOgpxdWvcRI/cSaXgGWC.bnjk0QwqGftO",
+    "role": "user"
+  },
+  {
+    "id": 1775489949396,
+    "username": "blabla",
+    "password": "$2b$10$Zw5bbFfwYivKyQMHUzSTMedvfxXaZRw9ID09InlInirhAMDneGkTS",
     "role": "user"
   }
 ]

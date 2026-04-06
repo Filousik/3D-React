@@ -118,7 +118,7 @@ app.delete("/cards/:id",loginAuth, async (req,res)=>{
       await fs.promises.unlink(imagePath);
 
     }catch(err){
-      console.log("Image file not found, skpping:", imagePath)
+      console.log("Image file not found", imagePath)
     }
    } 
 
@@ -194,8 +194,13 @@ app.post("/auth/login", async (req,res)=>{
 });
 
 app.post("/auth/logout", (req,res)=>{
-  req.session.destroy();
-  res.json({message:"Logged out"});
+  req.session.destroy((err)=>{
+    if (err){
+      return res.status(500).json({message:"Logout failed"})
+    }
+    res.json({message:"Logged out"}); 
+  });
+  
 
 });
 
@@ -226,6 +231,15 @@ app.patch("/cards/:id", loginAuth, async (req,res)=>{
     }
 
     const { brand, model, year, price, image } = req.body;
+    
+    if (image && card.image && image !== card.image) {
+    const oldImagePath = path.join(__dirname, card.image);
+    try {
+        await fs.promises.unlink(oldImagePath);
+    } catch (err) {
+        console.log("Old image not found:", oldImagePath);
+    }
+}
 
     if (brand) card.brand = brand;
     if (model) card.model = model;

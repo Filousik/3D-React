@@ -48,5 +48,65 @@
     "image": "/uploads/1775412483307-SkÃ¤rmbild 2023-04-05 213016.png",
     "ownerId": 1775412419879,
     "ownerName": "Noor"
+  },
+  {
+    "id": 1775489822156,
+    "brand": "fsdasd",
+    "model": "asdasdas",
+    "year": 78876,
+    "price": 5876896,
+    "image": "/uploads/1775489834804-SkÃ¤rmbild 2023-09-22 200256.png",
+    "ownerId": 1775489763870,
+    "ownerName": "Elliot"
+  },
+  {
+    "id": 1775490154593,
+    "brand": "dasd",
+    "model": "asdas",
+    "year": 76575,
+    "price": 756757,
+    "image": "/uploads/1775490154587-SkÃ¤rmbild 2023-12-09 175847.png",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
+  },
+  {
+    "id": 1775491243061,
+    "brand": "dsad",
+    "model": "asd",
+    "year": 34,
+    "price": 343,
+    "image": "/uploads/1775491243056-wallpaper-jinx-face-portrait-arcane-league-of-legends.jpeg",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
+  },
+  {
+    "id": 1775491257098,
+    "brand": "5436",
+    "model": "6436",
+    "year": 6436,
+    "price": 3463,
+    "image": "/uploads/1775491257093-parlament-97.png",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
+  },
+  {
+    "id": 1775491546998,
+    "brand": "sadas",
+    "model": "dsad",
+    "year": 34,
+    "price": 434,
+    "image": "/uploads/1775491546986-SkÃ¤rmbild 2023-09-22 195854.png",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
+  },
+  {
+    "id": 1775491575913,
+    "brand": "dasd",
+    "model": "asd",
+    "year": 747,
+    "price": 64764,
+    "image": "/uploads/1775491575905-SkÃ¤rmbild 2024-05-05 172638.png",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
   }
 ]

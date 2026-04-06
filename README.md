@@ -1,18 +1,9 @@
 # 3D-React
 GA
 
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDENGÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
-GÖR SÅ ATT EDIT TAR BORT DEN GAMLA BILDEN
+
+
+# Backend
 
 ## server.js
 server.js är min huvudfil inom backend. Den ansvarar för att starta min express-server, konfigurera middleware, API-rutter samt hanterar användares autentisering och data lagring. 
@@ -192,7 +183,7 @@ Delete routen är skyddad av loginAuth funktion samt är asynkron och använder 
       await fs.promises.unlink(imagePath);
 
     }catch(err){
-      console.log("Image file not found, skpping:", imagePath)
+      console.log("Image file not found", imagePath)
     }
    } 
   cards = cards.filter(card=>card.id !== id)
@@ -281,4 +272,211 @@ app.post("/auth/login", async (req,res)=>{
   }
 });
 ```
-Asynkron POST route för login, använder try and catch, 
+Asynkron POST route för login, använder try/catch för felhantering. Tar emot username, password från req.body (skickat från klienten), Hämtar alla användare med getUsers och väntar tills datan är inläst. Kontrollerar om användarnamnet finns i users.json annars returneras statuskod 400 med meddelande. Om användarnamnet matchar så jämför den lösenord med det hashade lösenordet och loggar in dig genom spara användarinformationen i sessionen ditt id, username och role.  Skickar också tillbaka användar data i JSON som bekräftelse. Om något går fel returneras det internt serverfel status 500.
+
+### Logout Route
+
+```js
+app.post("/auth/logout", (req,res)=>{
+  req.session.destroy((err)=>{
+    if (err){
+      return res.status(500).json({message:"Logout failed"})
+    }
+    res.json({message:"Logged out"}); 
+  });
+  });
+```
+Logout routen är en POST route som används för att förstöra användarens session och returnerar ett json meddelande som bekräftelse.Den använder en callback funktion som körs när den asynkrona operationen req.session.destroy() är klar- Callbacken tar emot err argument som innehåller det eventuella felet. Om ett fel uppstår returneras statuskod 500 för att hantera felet och hindra servern från att krascha.  
+
+### Inloggnings check Route
+```js
+app.get("/auth/me", (req,res)=>{
+  if (req.session.user){
+    res.json(req.session.user);
+
+  } else {
+    res.status(401).json({message: "Not logged in"})
+  }
+})
+```
+Detta är en GET-route som hämtar den aktuellt inloggade användaren via sessionen. Om det finns en aktuell användare skickas användarens information tillbaka som JSON. annars statuskod 401(unauthorized) med meddelandet. Behövs inte skyddas med loginAuth eller adminAuth för den gör en egen koll.
+
+```js
+app.patch("/cards/:id", loginAuth, async (req,res)=>{
+  try{
+    const id = Number(req.params.id);
+    let cards = await getCards();
+
+    const card = cards.find(card=> card.id == id);
+    if (!card) {
+      return res.status(404).json({message:"Card not found"});
+    }
+    const isOwner = card.ownerId === req.session.user.id
+    const isAdmin = req.session.user.role == "admin";
+    if (!isOwner && !isAdmin){
+      return res.status(403).json({message: "You may only edit your own card"});
+    }
+
+    const { brand, model, year, price, image } = req.body;
+
+    if (image && card.image && image !== card.image) {
+    const oldImagePath = path.join(__dirname, card.image);
+    try {
+        await fs.promises.unlink(oldImagePath);
+    } catch (err) {
+        console.log("Old image not found", oldImagePath);
+    }
+}
+
+    if (brand) card.brand = brand;
+    if (model) card.model = model;
+    if (year) card.year = Number(year);
+    if (price) card.price = Number(price);
+    if (image) card.image = image;
+
+    cards = cards.map(c => c.id == id ? card : c);
+    await saveCards(cards);
+    res.json(card)
+  }catch(err){
+    res.status(500).json({message: "Failed to update"})
+  }
+});
+```
+PATCH route används när man ska delvis uppdatera något, här används den för att uppdatera fält i cards man har laddat upp på sidan via dess id. Routen är skyddad med loginAuth för att hindra icke användare från att använda den. Först hämtas id från URL och alla cards laddas från lagringen via getCards. Därefter letar man efter kortet med det matchandet id, och om det inte hittas returneras 404 statuskod för "Not found". 
+
+Sedan görs behörighetskontroll där användaren antingen måste vara ägaren av kortet via ownerId eller ha rollen admin, annnars returneras statuskod 403 (forbidden). Efter hämtas eventuella uppdaterade fält från req.body, brand, model, year,price och image. För att inte fylla json filen med bilder när man uppdaterar måste den gamla bilden i uploads ta bort. Det görs genom att kolla om klienten har skickat med en ny bild i requesten och om card redan har en bild card.image därefter kontrollerar man om den nya bilden är samma som innan eller att bilden har ändrats. Koden körs alltså endast om en ny bild finns, en gammal bild finns och de är olika bilder. Om den gamla bilden inte hittas loggas det i konsolen tack vare try/catch för att inte krascha servern.
+
+
+Det viktiga med PATCH är att endast de fält som skickas i requesten uppdateras, vilket betyder till exempel om bara price skickas så ändras bara price medan resten av card blir oförändrat. När card uppdateras ersätts det gamla i listan med den uppdaterade versionen och hela listan sparas med saveCards. Till sist returneras det uppdaterade kortet som JSON. Om det blir fel under processen skickas statuskod 500.
+
+
+
+
+```js
+app.post("/cards", loginAuth, async (req, res) => {
+  try{
+    const {brand, model, year, price, image} = req.body;
+
+    if(!brand|| !model || !year || !price){
+      return res.status(400).json({message:"Missing required fields"});
+    }
+  
+
+
+  const cards = await getCards()
+  const newCard = {
+    id: Date.now(),
+    brand, 
+    model, 
+    year: Number(year),
+    price: Number(price), 
+    image: image || "",
+    ownerId: req.session.user.id,
+    ownerName: req.session.user.username
+  };
+  cards.push(newCard)
+  await saveCards(cards)
+  res.json(newCard)
+  } catch(err){
+    res.status(500).json({message:"Failed to save card"})
+  }
+});
+
+```
+
+Skyddad asynkron POST route, allt är i en try/catch sats ifall internt server fel uppstår. Först hämtas data från requesten klienten skickar, därefter valideras om det obligatoriska datan finns, brand, model, year, och price. Annars skickas statuskod 400 för "Bad request". Konstanten cards hämtar cards arrayen via getCards och fortsätter när datan har hämtats pga await och async. newCard är det nya kortet som skapas av klienten, Date.now() för id och Number framför year och price för att se tiil att det inte är strings. Kortet får även användarens id för att senare kunna kontrollera vem som skapat den, samma med username. Till sist läggs det nya kortet till i listan och skrivs till filen via saveCards och det nya kortet skickas via json. Det problematiska med Date.now är att det kan krocka om flera användare skapar kort exakt samtidigt. Därför är try/catch bra men Date.now bör bytas till något annat senare.
+
+
+
+## Upload och Filhantering
+```js
+import uploadRoutes from "./routes/upload.routes.js"
+app.use("/api/upload", uploadRoutes)
+```
+Importerar en router från en separat js fil för struktur. Raden: app.use("/api/upload", uploadRoutes) kopplar routern till bas urlen /api/upload så alla routes som nås via det här prefixet /api/upload kommer hanteras av routern som exporteras från filen t.ex router.post("/") kommer bli tillgänglig via POST /api/upload . Innehållet visas nedanför:
+
+
+### upload.routes.js
+```js
+
+import express from "express"
+import multer from "multer"
+import path from "path"
+
+const router = express.Router()
+
+const storage = multer.diskStorage({
+    destination: "uploads/",
+    filename: (req, file, cb)=>{
+        const uniqueName = Date.now() + "-" + file.originalname
+        cb(null, uniqueName)
+    }
+})
+
+```
+Här importeras express för skapa routern, multer för att hantera filuppladdningarna och path för att göra filvägar samt filändelser som krävs. const router = express.Router() är enda anledningen till att jag kan ha detta i separat fil, det används i stället för app i server.js. const storage = multer.diskStorage bestämmer hur och var filerna ska sparas på servern. Destinationen är då serverns uploadmapp.För att bestämma filens namn så kollar vi klientens request, information om filen t.ex namn och använder en callback funktion som körs när filen hanteras. För att filer inte ska skriva över varandra så läggs tiden i milisekunder Date.now till namnet tillsammans med filens original namn. 
+
+```js
+function fileFilter(req, file, cb) {
+    const allowedTypes = [
+        ".png",
+        ".jpg",
+        ".jpeg"
+    ]
+    const ext = path.extname(file.originalname).toLowerCase()
+
+    if (allowedTypes.includes(ext)){
+        cb(null, true)
+    }else {
+        cb(new Error("File type not allowed"), false);
+        
+    }
+}
+
+```
+Funktion som hanterar vilka filer är tillåtna att laddas upp på sidan. Konstant som väljer vilka filändelser ska tillåtas, och const ext kollar filändelsen på filens original namn och gör sedan det till små bokstäver med toLowerCase funktionen. If satsen kollar därefter om den uppladdade filen innehåller en filändelse som inkluderas i den tillåtna listan. cb(null, true) körs och betyder att inget fel finns och den ska acceptera filen då filändelsen är tillåten. Annars om filändelsen inte finns i listan så skapas ett fel med meddelandet "File type not allowed", och den får inte gå vidare med uppladdningen eftersom filändelsen inte finns i listan. 
+```js
+
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: {
+        fileSize: 10* 1024* 1024 // 10MB
+    }
+
+})
+```
+Här definieras att multer ska köras, sparas i storage och använda filfiltrerings funktionen samt begränsing på filens storlek. 
+```js
+router.post("/", upload.single("image"), (req,res)=>{
+    const file = req.file
+
+    res.json({
+        message: "Uploaded file",
+        image: `/uploads/${req.file.filename}` 
+    })  
+})
+export default router
+
+```
+POST route och eftersom jag använder app.use("/api/upload") så kommer den bli /api/upload. upload.single("image") är ett middleware från multer som tar emot en enda fil och
+kräver att input fältet heter "image". Efter multer körs req.file som innehåller info om filen såsom filnman, sökväg och storlek vilket sparas i konstanten file. Till slut skickas svar till klienten via res.json med meddelande och filens filsökväg och router exporteras för att sedan importeras i server.js.
+
+
+
+
+# Frontend - React 
+
+App.jsx
+main.jsx
+About.jsx
+Home.jsx
+Card.jsx
+UploadModal.jsx
+AuthModal.jsx
+EditModal.jsx
+AuthContext.jsx
+UploadContext.jsx
+
+
+

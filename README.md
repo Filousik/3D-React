@@ -509,15 +509,592 @@ function Header({page, setPage, setShowModal, setShowUploadModal})
 ```
 Ett problem med detta kan uppstå när det blir alldeles för många funktioner att skicka props igenom t.ex om jag har Header med en nav och en button i nav som behöver t.ex page. Då måste jag skicka vidare propertyn page via header och sedan nav för att button ska kunna använda den. Context löser detta genom att dela data globalt utan det här då vilken komponent som helst oavsett ordningen det är uppbyggt i ska kunna läsa data direkt från kontexten.
 
-## App.jsx
+## App.jsx Huvudkomponenten
 
-App.jsx Nästa
+### Imports 
+```jsx
+import './App.css'
+import About from './components/About/About.jsx'
+import Home from './components/Home/Home.jsx'
+import { useState } from "react"
+import { AuthProvider, useAuth } from './context/AuthContext.jsx'
+import AuthModal from './components/AuthModal/AuthModal.jsx'
+import { CardProvider, useCards } from './context/UploadContext.jsx'
+import UploadModal from './components/UploadModal/UploadModal.jsx'
+import EditModal from './components/EditModal/EditModal.jsx'
+```
+Högst upp i App.jsx importeras alla komponenter och annat som App.jsx behöver. App.css är komponentens egna css vilket inte har någon css just nu. Komponenterna för de olika sidorna är About och Home som importeras för att renderas beroende på vilken sida användaren är på. useState importeras från React för att hantera state t.ex setPage="1" eller om page="0" visa Home. AuthProvider och useAuth importeras från min AuthContext för att kunna ge applikationen tillgång till autentisering samt låta alla komponenter kunna använda det. CardProvider och useCards importeras från uploadContext för att hantera korten. De tre modal komponenterna importeras för renderas när de behövs. 
+
+
+### App komponenten och sidhantering
+```jsx
+function App() {
+ const [page, setPage] = useState(()=>{
+  const saved = sessionStorage.getItem("page");
+  return saved ? Number(saved) : 0;
+ })
+
+
+ const [showUploadModal, setShowUploadModal] = useState(false);
+ const [showModal, setShowModal] = useState(false);
+
+ function handleSetPage(newPage){
+  setPage(newPage);
+  sessionStorage.setItem("page",newPage);
+ }
+ ```
+Inuti app komponenten så börjar applikation med att använda React state för att hålla reda på vilken sida som användaren är på just nu genom page variabeln. När app först renderas hämtas page från sessionStorage ifall det finns ett sparat värde, vilket gör att användaren stannar kvar på samma sida även om man laddar om sidan och om inget värde har sparats så används 0 som default värde. Nedanför används för att syra om popup modalerna ska visas alltså Upload modalen och Auth modalen. showUploadModal och showModal håller koll om det ska visas och setShowUploadModal och setShowModal är funktion för att ändra på värdet för att antingen gömma eller vissa beroende på true/false.
+
+Funktionen under skickar man in en ny sida som argument och ändrar den nuvarande sidan till den nya som därefter sparar det nya sidvärdet i sessionstorage.
+
+ ```jsx
+  return (
+    <AuthProvider>
+      <CardProvider>
+      <>
+        <Header page={page}
+        setPage={handleSetPage}
+        setShowModal={setShowModal}
+        setShowUploadModal={setShowUploadModal}></Header>
+
+        {page == 0 && <Home />}
+        {page == 1 && <About />}
+        {page == 3 && <Cards />}
+      
+        <Footer></Footer>
+        {showModal && <AuthModal onClose={() => setShowModal(false)} />}
+        {showUploadModal && <UploadModal onClose={() => setShowUploadModal(false)} />}
+        
+      </>
+      </CardProvider>
+    </AuthProvider>
+  )
+}
+export default App
+```
+Det här är vad som renderas av komponenten. AuthProvider och CardProvider sträcker sig runt hela innehållet, vilket innebär att de här komponenterna förser global state (context) för autentisering och korten till resten av applikationen. Inuti de två providers renderas först Header komponenten som får flera props såsom den aktuella sida (page), en funktion för att byta sida handleSetPage och funktionerna setShowModal, setShowUploadModal för att visa modal popupsen vid förfrågan. Allt detta gör att Headern kan styra sidnavigering och öppna modal popupsen vid behov.
+
+Därefter renderas de olika sidorna beroende på värdet av page. Om page är 0 så renderas Home, 1 => About, 3 => Cards. Enkelt sätt att hantera sidorna utan t.ex React Router. Efter det renderas Footer komponenten vilket alltid visas längst ner. Efter footer hanteras modalerna. Om showModal är sann visas AuthModal, och om showUploadModal är sann så visas UploadModal. Båda använder en onClose funktion för att ändra deras React state till false för att gömma de när de stängs.
+
+```jsx
+function Header({page, setPage, setShowModal, setShowUploadModal}){
+  const {user, logout} = useAuth();
+
+  return(
+    <header>
+      
+
+      <nav className='container'>
+          <button className="btn" onClick={()=>setPage(0)}>Home</button>
+          <button className="btn" onClick={()=>setPage(1)}>About</button>
+          <button className="btn" onClick={()=>setPage(3)}>Cards</button>
+          
+
+         {user ? ( /*Om användare finns/aktiv så visas username idiv och logout knapp annars visas modal när man trycker på signin knappen*/
+          <>
+            <button className="btn" onClick={()=> setShowUploadModal(true)}>Upload</button>
+            <button className="btn" onClick={logout}>Logout</button>
+          </>
+        ) : (
+          <button className="btn" onClick={() => setShowModal(true)}>
+            Sign in/Up
+          </button>
+        )}
+        </nav>
+     
+    </header>
+
+)}
+```
+Här är Header komponenten. Med nav och 3 knappar som använder onClick funktionen för att enkelt ändra state på page när knapparna trycks på. Home knappen ändrar state till 0, About till 1 och Cards till 3. (Ingen har 2 för den komponenten togs bort.) Därefter om användare är sann/finns sp kommer Upload knappen och logout knappen att finnas i naven. Upload knappen använder också onClick funktionen för att ändra React state på ShowUploadModal till sann för att visa modalen. Vid klick på logout så används logout som hämtas från useAuth.
+
+```jsx
+
+function Footer(){
+    return(
+        <footer>
+         <h2>Footer</h2>
+        </footer>
+    )
+}
+```
+Footer komponent med en h2 tagg i som säger footer.
+
+```jsx
+function Cards(){
+  const {cards, loading, error, delCard} = useCards();
+  const { user } = useAuth();
+  const [editingCard, setEditingCard] = useState(null);
+
+  if (loading) return <p>Loading cards</p>
+  if (error) return <p> {error} </p>
+```
+Här definieras Cards komponenten, med useCards() hämtas flera väden: cards, som innehåller alla cards, loading, som visar att datan håller på att laddas, error för eventuella felmeddelanden och delCard funktionen för att ta bort ett card. useAuth() används också för att hämta information om den inloggade användaren via user variabeln.
+Komponenten använder state även lokalt för editingCard och setEditingCard som från början är null för att inget card redigeras men kan senare ändras. Innan komponenten renderar något så returnerar den en en p tagg som visar att korten håller på att laddas och om ett fel uppstår så returneras felmeddelandet istället. 
+```jsx
+return (
+     <div className="cards-grid">
+            {cards.map(card => (
+                <div className="Card" key={card.id}>
+                    <img src={card.image} alt={`${card.brand} ${card.model}`} />
+                    <h3>{card.brand} {card.model}</h3>
+                    <p>Year: {card.year}</p>
+                    <p>Price: {card.price}</p>
+                    <p>Added by {card.ownerName}</p>
+                    {user && (user.id == card.ownerId || user.role === "admin") && (
+                       <>
+                      <button onClick={() => setEditingCard(card)}>Edit</button>
+                      <button onClick={() => delCard(card.id)}>Delete</button>
+                       
+                       </>
+                        
+                    )}
+                </div>
+            ))}
+```
+Det som renderas när komponenten anropas är html liknande. Koden renderar en lista av alla cards genom att loopa igenom arrayen cards med hjälp av map. För varje card i listan så skapas ett nytt element som visar information om kortet först, bilden, märke, år, price och vem som lade upp det. Därefter om en användare är inloggad och deras id är samma som id av den som lade upp kortet eller har admin rollen så kommer knapparna för Edit och delete att visas. När användaren klickar på edit så anropas setEditingCard och det aktuella kortet sätts i ett redigeringsläge. När delete klickas anropas istället funktionen delCard med kortets id vilket tar bort kortet.
+```jsx
+        {editingCard && (
+          <EditModal
+          card={editingCard}
+          onClose={()=> setEditingCard(null)}
+          />
+        )}
+        </div>
+  )
+}
+```
+Till sist om editingCard är sann så renderas Edit modalen och när det stängs anropas onClose funktionen som sätter EditingCard till null med setEditingCard då inget kort längre redigeras.
+
+
+## Home och About komponenter
+
+```jsx
+export default function Home(){
+   return(
+    <main className="Home">
+        This is home page homeboy
+    </main>
+   )
+}
+```
+Komponenten Home vilket är home sidan.
+```jsx
+export default function About(){
+   return(
+    <main className="About">
+        This is about page homeboy
+    </main>
+   )
+}
+
+```
+About komponenten som är about sidan.
+
+## Modal popups: Auth, Upload och Edit
+
+```jsx
+
+import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import "./AuthModal.css";
+
+
+export default function AuthModal({onClose}){
+
+    const [tab, setTab] = useState("login");
+
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+
+    const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const {login, register} = useAuth();
+```
+AuthModal hanterar både inloggning och registrering via ett tabsystem. "tab" state styr vilken av login och register ska visas och det börjar med login. Både login och register hämtas direkt från AuthContext via useAuth() och det betyder att modalen behöver inte veta hur det fungerar, den anropar bara funktionerna.
+```jsx
+
+    async function handleSubmit(){
+        setError(null);
+        setLoading(true);
+
+        try{
+            if (tab == "login"){
+
+                await login(username, password);
+
+            } else{
+                await register(username, password);
+                await login(username, password);
+            }
+
+            onClose();    
+
+        }catch(err){
+            setError(err.message);
+        }finally{
+            setLoading(false);
+        }
+    }
+```
+handleSubmit funktion är asynkron och börjar med att rensa felmeddelande om det finns och sätter loading till true för att inaktivera knappen efter klick medan en request pågår. Därefter är det en try/catch och en if sats som kollar om tab är login aktiv. Om login tabben är aktiv så anropas login, annars anropas register och login för att logga in användaren automatiskt efter registrering. onClose stänger modalen om allt funkat som det ska. Om login eller register får ett fel så fångas det och visas för användaren, finally återställ loading till false.
+```jsx
+
+    function handleEnter(e){
+        if (e.key == "Enter") handleSubmit();
+    }
+
+```
+funktion som kollar om eventet som inträffar är att tangenten enter trycks ner och i såfall kör den handleSubmit funktionen istället för att behöva klicka på knappen.
+```jsx
+    return(
+         <div className="modal-overlay" onClick={onClose}>
+
+      {/*StopPropagation hindrar en från att klicka bort modal och klickar på den*/}
+      <div className="modal" onClick={e => e.stopPropagation()}>
+
+        
+        <button className="modal-close" onClick={onClose}>✕</button>
+```
+Vid klick utanför modalen så stängs den ner medan stopPropagation hindrar att klick inuti modalen stänger ner den.
+
+```jsx
+
+        {/* Login Register tabbarna */}
+        <div className="modal-tabs">
+          <button
+            className={tab == "login" ? "active" : ""}
+            onClick={() => {
+              setTab("login");
+              setError(null); //Nollställer error vid tabbswitch
+            }}
+          >Login</button>
+          <button
+            className={tab == "register" ? "active" : ""}
+            onClick={() => {
+              setTab("register");
+              setError(null); 
+            }}
+          >Register</button>
+        </div>
+
+        
+        <h2>{tab == "login" ? "Welcome" : "Create account"}</h2>
+
+```
+className={tab == "login" ? active : ""} gör att om tab är login så får knappen klassen "active" annars får den "".  När den klickas på ändrar den state på tab till "login" och nollställer error. Samma gäller för Register knappen fast klassen active ges om tabben är register annars får den "". Vid klick på knappen ändrar den state på tab till register och nollställer också error. Längst ner är en h2 tagg som visar Welcome om tab == "login" är sann annars "Create account".
+```jsx
+
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          onKeyDown={handleEnter}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          onKeyDown={handleEnter}
+        />
+
+        <button
+          className="btn modal-submit"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+        {tab == "login" ? "Login":"Register"}  
+        </button>
+
+      </div>
+    </div>
+  )
+}      
+```
+Inputfälten är kontrollerade komponenter "value={username}" och "value={password}", gör att React styr det som visas i fältet. onChange körs vid varje knapptryckning och uppdaterar state med "e.target.value" vilket är det skrivna värdet. onKeyDown lyssnar efter knapptryckningar och anropar handleSubmit om Enter trycks ner.
+
+### UploadModal.jsx och EditModal.jsx
+De här två modalerna delar samma CSS fil och är uppbyggda på praktiskt taget samma sätt. Skillnaderna är följande:
+```jsx
+// UploadModal har tomma startvärden i state.
+const [brand, setBrand] = useState("");
+const [model, setModel] = useState("");
+
+// EditModal förifyllda med befintlig kortdata
+const [brand, setBrand] = useState(card.brand);
+const [model, setModel] = useState(card.model);
+```
+
+UploadModal börjar med tomma fält eftersom ingen data finns då det är ett nytt kort.
+EditModal får hela kortobjektet som prop och förifylls med data som redan finns. Användaren ser vad som finns och kan ändrar det de vill.
+```jsx
+
+//UploadModal hämtar addCard
+
+const { addCard } = useCards();
+
+// EditModal hämtar updateCard
+const { updateCard } = useCards();
+```
+Båda hämtar sin funktion från UploadCOntext. UploadModal anropar "addCard" och EditModal anropar "updateCard" med kortets id som argument.
+
+```jsx
+// EditModal visar också nuvarande bild i det card som är valt om det finns en bild.
+{card.image && (
+ <div>
+    <p className="Cimage">Current image:</p>
+      <img
+      src={card.image}
+      alt="current"
+      style={{ width: "100%", height: "120px", objectFit: "cover", borderRadius: "8px" }}
+    />
+ </div>
+)}
+```
+Om det inte finns en bild i card över huvudtaget så visas ingenting då det är en vilkorlig rendering "card.image &&". style={{}} är inline CSS i JSX de dubbla klamrarna är för att den yttre är jsx uttryck och den inre är javascript objekt.
+
+
+```jsx
+//Filinput i båda modalerna
+<input
+    type="file"
+    accept="image/*"
+    onChange={e => setImage(e.target.files[0])}
+/>
+
+```
+Till skillnad från vanlig input där e.target.value används så används e.target.files istället som är en array med valda filer. "[0]" hämtar den första och enda filen. "accept="image/*" begränsar filväljaren till att bara visa bildfiler. I Editmodal betyder null i image state att den ska behålla den befintliga bilden. Bara om användaren väljer en ny fil laddas den upp.
+
+```jsx
+ <button
+        className="btn modal-submit"
+        onClick={handleSubmit}
+        disabled={loading}
+        >
+        {loading ? "Saving..." : "Save changes"}
+ </button>
+
+```
+disabled={loading} gör knappen inaktivt medan uppladdning pågår som sagt och utan detta hade användaren kunnat spamma för skapa duplicerade kort. Ternary operatorn ändrar knappens text för att ge användare info om något händer. "Saving..." ifall loading är true annars Save changes.
+
+```jsx
+import { createContext, useContext, useState, useEffect } from "react";
+
+
+
+const AuthContext = createContext();
+
+
+export function AuthProvider({children}){
+    const [user, setUser] = useState(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(()=>{
+        async function checkSession(){
+            try{
+                const res = await fetch("/auth/me");
+                if (res.ok){
+                    const data = await res.json();
+                    setUser(data);
+                }
+            }catch(err){
+                console.log("No active session")
+            }finally{
+                setLoading(false);
+            }
+        }
+        checkSession();
+    }, [])
+
+    
+
+
+
+async function login(username, password) {
+    const res = await fetch("/auth/login",{
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({username, password})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+    setUser({id: data.id, username: data.username, role: data.role});
+}
+
+async function register(username, password){
+    const res = await fetch("/auth/register",{
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({username,password})
+    });
+    const data = await res.json();
+    if(!res.ok)throw new Error(data.message);
+}
+
+async function logout(){
+    await fetch("/auth/logout",{method:"POST"});
+    setUser(null);
+}
+
+
+return (
+    <AuthContext.Provider value={{user, loading, login, register, logout}}>
+        {children}
+    </AuthContext.Provider>
+);
+
+}
+
+export function useAuth(){
+    return useContext(AuthContext);
+}
+
+
+```
+
+```jsx
+import { createContext, useContext, useState, useEffect } from "react";
+import {useAuth} from "./AuthContext";
+
+
+
+const UploadContext = createContext();
+
+export function CardProvider({children}){
+    const [cards, setCards] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const {user} = useAuth();
+
+    useEffect(()=>{
+        loadCards();
+    }, [user]);
+
+
+
+
+
+async function loadCards(){
+    try{
+        const res = await fetch("/cards");
+        const data = await res.json();
+        setCards(data);
+    }catch(err){
+        setError("Cards could not load.")
+    }finally{
+        setLoading(false)
+    }
+}
+
+
+
+async function addCard(brand, model, year, price, image){
+    let imagePath = "";
+    if (image) {
+        const formData = new FormData();
+        formData.append("image", image);
+        const uploadRes = await fetch("/api/upload",{
+            method:"POST",
+            body: formData
+            
+        });
+        if (!uploadRes.ok) throw new Error("Upload failed");
+        const uploadData = await uploadRes.json();
+        imagePath = uploadData.image;
+
+    }
+
+    const res = await fetch("/cards",{
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({brand, model, year, price, image:imagePath})
+    });
+    if (!res.ok){
+        const data = await res.json();
+        throw new Error(data.message);
+    }
+    const newCard = await res.json();
+    setCards(prev => [...prev, newCard]);
+    return newCard;
+}
+
+async function updateCard(id, brand, model, year, price, image){
+    let imagePath = null; // Om ingen bild laddas up ändra inte//
+    
+
+    if (image && typeof image !== "string"){
+        const formData = new FormData();
+        formData.append("image", image);
+        const uploadRes = await fetch("/api/upload",{
+            method:"POST",
+            body: formData
+        });
+        if (!uploadRes.ok) throw new Error("Image upload failed");
+        const uploadData = await uploadRes.json();
+        imagePath = uploadData.image;
+    }
+
+    const res = await fetch("/cards/"+ id,{
+        method:"PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            brand,
+            model,
+            year,
+            price,
+            image: imagePath || undefined
+    })
+});
+
+
+    const updatedCard = await res.json();
+    setCards(prev=>prev.map(c=>c.id == id ? updatedCard : c));
+    return updatedCard;
+
+}
+
+async function delCard(id){
+    const res = await fetch("/cards/"+id, {method:"DELETE"});
+    if (!res.ok){
+        const data = await res.json();
+        throw new Error(data.message)
+    }
+    setCards(prev => prev.filter(card => card.id !== id));
+}
+return(
+    <UploadContext.Provider value={{cards,loading,error,addCard,delCard, updateCard}}>
+        {children}
+    </UploadContext.Provider>
+);
+}
+
+export function useCards(){
+    return useContext(UploadContext);
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+App.jsx Klar typ
 main.jsx klar
-About.jsx Simpel komponent
-Home.jsx Simpel komponent
-Card.jsx
-UploadModal.jsx
+About.jsx Simpel komponent klar
+Home.jsx Simpel komponent klar
+
+
+
 AuthModal.jsx
+UploadModal.jsx
 EditModal.jsx
 AuthContext.jsx
 UploadContext.jsx

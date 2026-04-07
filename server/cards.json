@@ -85,7 +85,7 @@
     "model": "6436",
     "year": 6436,
     "price": 3463,
-    "image": "/uploads/1775491257093-parlament-97.png",
+    "image": "/uploads/1775564819619-SkÃ¤rmbild 2025-05-20 183241.png",
     "ownerId": 1775231131632,
     "ownerName": "55"
   },
@@ -108,5 +108,25 @@
     "image": "/uploads/1775491575905-SkÃ¤rmbild 2024-05-05 172638.png",
     "ownerId": 1775231131632,
     "ownerName": "55"
+  },
+  {
+    "id": 1775564788172,
+    "brand": "sadas",
+    "model": "dasda",
+    "year": 5435,
+    "price": 345345,
+    "image": "/uploads/1775564788167-SkÃ¤rmbild 2025-06-30 160450.png",
+    "ownerId": 1775564729350,
+    "ownerName": "alva"
+  },
+  {
+    "id": 1775564874863,
+    "brand": "lallish",
+    "model": "smattrish",
+    "year": 4343,
+    "price": 232,
+    "image": "/uploads/1775564874859-SkÃ¤rmbild 2024-06-25 234034.png",
+    "ownerId": 1775228428027,
+    "ownerName": "Admin"
   }
 ]

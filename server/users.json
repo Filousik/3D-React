@@ -64,5 +64,17 @@
     "username": "blabla",
     "password": "$2b$10$Zw5bbFfwYivKyQMHUzSTMedvfxXaZRw9ID09InlInirhAMDneGkTS",
     "role": "user"
+  },
+  {
+    "id": 1775564729350,
+    "username": "alva",
+    "password": "$2b$10$Jz/FzruVJ9VMXSUgEZFCPuNPcgsfSuztDeAkr/WtPfy5HVQlJN/zK",
+    "role": "user"
+  },
+  {
+    "id": 1775584054711,
+    "username": "pappa",
+    "password": "$2b$10$tUMoYzfOIKkraxrnBw9MEuVUgzQEZ5dV3XQv2I3yMQEPaQITAPGVq",
+    "role": "user"
   }
 ]

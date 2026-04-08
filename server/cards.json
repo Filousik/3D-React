@@ -80,16 +80,6 @@
     "ownerName": "55"
   },
   {
-    "id": 1775491257098,
-    "brand": "5436",
-    "model": "6436",
-    "year": 6436,
-    "price": 3463,
-    "image": "/uploads/1775564819619-SkÃ¤rmbild 2025-05-20 183241.png",
-    "ownerId": 1775231131632,
-    "ownerName": "55"
-  },
-  {
     "id": 1775491546998,
     "brand": "sadas",
     "model": "dsad",
@@ -118,15 +108,5 @@
     "image": "/uploads/1775564788167-SkÃ¤rmbild 2025-06-30 160450.png",
     "ownerId": 1775564729350,
     "ownerName": "alva"
-  },
-  {
-    "id": 1775564874863,
-    "brand": "lallish",
-    "model": "smattrish",
-    "year": 4343,
-    "price": 232,
-    "image": "/uploads/1775564874859-SkÃ¤rmbild 2024-06-25 234034.png",
-    "ownerId": 1775228428027,
-    "ownerName": "Admin"
   }
 ]

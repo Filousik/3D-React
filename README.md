@@ -95,7 +95,7 @@ async function getCards(){
   
 }
 ```
-Jag använder fs promises för att kunna köra funktioner asynkront för servern inte ska haka upp sig på en sak. Jag vill att flera funktioner kan köras i bakgrunden utan problem. Därför använder jag async och fs promises och await för att servern ska vänta i detta fallet tills filen är uppläst och promise för att lova att ge resultat senare. Jag använder try and catch för att om det blir fel och filen inte finns så returnas tom array för att inte krascha servern.
+Jag använder fs promises för att kunna köra funktioner asynkront för servern inte ska haka upp sig på en sak. Jag vill att flera funktioner kan köras i bakgrunden utan problem. Därför använder jag async och fs promises och await för att servern ska vänta i detta fallet tills filen är uppläst och promise används för att hantera asynkrona operationer och returnerar ett resultat i framtiden. Jag använder try and catch för att om det blir fel och filen inte finns så returnas tom array för att inte krascha servern.
 
 
 ### Spara cards
@@ -879,14 +879,22 @@ Till skillnad från vanlig input där e.target.value används så används e.tar
 ```
 disabled={loading} gör knappen inaktivt medan uppladdning pågår som sagt och utan detta hade användaren kunnat spamma för skapa duplicerade kort. Ternary operatorn ändrar knappens text för att ge användare info om något händer. "Saving..." ifall loading är true annars Save changes.
 
+## Context
+
+### AuthContext: Hantering av autentisering
+Den här filen skapar och hanterar autentisering i hela React applikationen med hjälp av Context API. Mitt syfte med det är att göra användardata samt autentiseringsfunktionerna tillgängliga globalt utan att behöva skicka props genom flera komponenter.
+
+
 ```jsx
 import { createContext, useContext, useState, useEffect } from "react";
 
-
-
 const AuthContext = createContext();
+```
+Först importeras funktioner från React som behövs för att skapa och använda context samt hantera state. 
+createContext för att skapa ett context, useContext för att använda det, useState för state, useEffect för att köra kod vid rendering. useEffect körs en gång när det laddas in om inte man lägger till ett vilkor som t.ex varje gång user ändras. Därefter skapas contextet som fungerar som en behållare för all autentiseringsdata.
 
-
+### AuthProvider
+```jsx
 export function AuthProvider({children}){
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -908,10 +916,13 @@ export function AuthProvider({children}){
         checkSession();
     }, [])
 
-    
+```
+AuthProvider är en komponent som omsluter hela applikationen. Alla komponenter som ligger inuti den får tillgång till autentiseringsdatan. State variabeln user börjar som null då ingen är inloggad från början och loading true då det används för att visa att applikationen kontrollerar om en användare redan har en aktiv session. 
+
+När applikationen laddas körs useEffect en gång då den inte har något i dependency arrayen att kontrollera.Inuti useEffect definieras en asynkron funktion som skickar en request till backend route "/auth/me" för att kontrollera om användaren redan är inloggad och om hämtningen av route är OK så hämtas användar datan och sparas i user via state annars om det går fel loggas det som "No active session" Till slut sätts loading till false oavsett resultat och då vet applikationen att kontrollen är klar och den kan rendera rätt innehåll. Efter att funktionen har definierats så körs den.
 
 
-
+```jsx
 async function login(username, password) {
     const res = await fetch("/auth/login",{
         method:"POST",
@@ -922,6 +933,10 @@ async function login(username, password) {
     if (!res.ok) throw new Error(data.message);
     setUser({id: data.id, username: data.username, role: data.role});
 }
+```
+Funktionen login används för att logga in en användare genom att skicka en POST-request till backend-routen "/auth/login". ANvändarnamn och lösenord skickas med i requestens body som JSON. När svaret kommer tillbaka konverteras det till Javascript objekt. Om svaret inte är OK kastas ett fel med meddelandet från servern. Om inloggningen lyckas sparas användarens information (id,username,roll) i user state variabeln, som gör att resten av applikationen vet att en användare är inloggad.
+
+```jsx
 
 async function register(username, password){
     const res = await fetch("/auth/register",{
@@ -932,28 +947,51 @@ async function register(username, password){
     const data = await res.json();
     if(!res.ok)throw new Error(data.message);
 }
+```
+Funktionen register används för att skapa en ny användare. Den skickar på samma sätt en POST-request, men till "/auth/register", med användarnamn och lösenord i body. Svaret konverteras till JSON och om något går fel kastas ett felmeddelande. Funktionen i sig loggar inte in användaren, det görs separat efter registrering(Genom att köra login funktionen direkt efter).
 
+```jsx
 async function logout(){
     await fetch("/auth/logout",{method:"POST"});
     setUser(null);
 }
-
+```
+Den här asynkrona logout funktionen används för att logga ut användaren. Den skickar en POST-request till "/auth/logout" och när den är klar sätts state variabeln user till null. Det gör att applikationen uppdateras och behandlar användaren som utloggad.
+```jsx
 
 return (
     <AuthContext.Provider value={{user, loading, login, register, logout}}>
         {children}
     </AuthContext.Provider>
 );
-
 }
+```
+Det som returneras av AuthProvider är AuthContext.Provider och är det som faktiskt delar ut datan till resten av applikationen. "value" är ett objekt med allt som ska vara tillgängligt: user, loading, login, register och logout. 
+Alla komponenter som omsluts av den här Provider kan läsa värdena. "children" är ett speciellt prop i React som representerar allt som renderas inuti komponenten.
 
+
+```jsx
 export function useAuth(){
     return useContext(AuthContext);
 }
 
+```
+"useContext(AuthContext)" läser det som lagts i Providers value och returnerar det. "useAuth" är en custom hook => en funktion som börjar med "use" och som anropar andra React-hooks inuti sig. Utan custom hook hade varje komponent behövt importera både "useContext" och "AuthContext" separat. Till exempel:
+```jsx
+// Utan en custom hook:
+import { useContext } from "react"
+import { AuthContext } from "../../context/AuthContext"
+const { user } = useContext(AuthContext)
 
+// Med en custom hook:
+import { useAuth } from "../../context/AuthContext"
+const { user } = useAuth()
 ```
 
+
+## UploadContext.jsx Korthanteringskontext
+
+UploadContext är ungefär samma som AuthContext men ansvarar för all korthantering som hämtning, skapande, uppdatering och borttagning. Genom att samla all kortlogik här i context behöver ingen enskild komponent göra egna fetch anrop.
 ```jsx
 import { createContext, useContext, useState, useEffect } from "react";
 import {useAuth} from "./AuthContext";
@@ -972,10 +1010,15 @@ export function CardProvider({children}){
         loadCards();
     }, [user]);
 
+```
+Till skillnad från AuthContext importerar CardProvider "user" från AuthContext via "useAuth()". Det funkar eftersom CardProvider är omsluten av AutoProvider i App.jsx vilket ger den tillgång till AuthContext. 
 
+"cards" är arrayen med alla kort och börjar som tom, "loading" börjar som true för att visa laddningstext medan korten hämtas. "error" håller eventuella felmeddelanden som visas för användaren.
 
+"useEffect" har "[user]" som dependency array istället för en tom "[]" detta betyder att "loadCards" körs varje gång som "user" ändras och inte bara vid start. Detta löser problemet med att när en användare loggar in så ändras user från null till ett användarobjekt vilket triggar en omladdning av korten för att på så sätt rendera de med korrekt användardata och ägarkontroll så edit och delete knapparna visas samt fungerar direkt utan att behöva ladda om sidan manuellt.
 
-
+### loadCards 
+```jsx
 async function loadCards(){
     try{
         const res = await fetch("/cards");
@@ -987,9 +1030,11 @@ async function loadCards(){
         setLoading(false)
     }
 }
+```
+Asynkron funktion som hämtar alla kort från serverns Get /cards route och spara dem i state med "setCards". "catch" fångar fel och sparar felmeddelandet i error state som Cards komponenten sedan visar för användaren. finally sätter alltid loading till false oavsett resultat som sagt så att laddningstexten alltid försvinner.
 
-
-
+### addCard
+```jsx
 async function addCard(brand, model, year, price, image){
     let imagePath = "";
     if (image) {
@@ -1006,6 +1051,14 @@ async function addCard(brand, model, year, price, image){
 
     }
 
+```
+Att skapa ett kort tar två steg eftersom bilden måste laddas upp separat för att ge tillbaka en filsökväg innan kortet kan skapas med rätt bildreferens.
+
+Första steget: Ladda upp bilden
+Om en bild valdes så skapas ett formData objekt. FormData är ett speciellt webbläsarobjekt för att skicka filer. Vanlig JSON kan inte innehålla filer. "formData.append("image", image) lägger till filen under nyckeln "image" som måste matcha vad multer på servern förväntar sig. Webbläsaren sätter automatiskt rätt Content-Type header med boundary för multiparty-data. Så man sätter inte den manuellt. Servern svarar därefter med sökvägen där bilden sparades t.ex "/uploads/17892382983-test.png" som sparas i "imagePath".
+
+```jsx
+
     const res = await fetch("/cards",{
         method:"POST",
         headers: {"Content-Type":"application/json"},
@@ -1019,7 +1072,13 @@ async function addCard(brand, model, year, price, image){
     setCards(prev => [...prev, newCard]);
     return newCard;
 }
+```
+Det andra steget är att skapa kortet.
+En vanlig JSON-request skickas med kortdata och bildsökvägen från steg 1. Om ingen bild har valts så är "imagePath" en tom sträng. Servern svarar med det skapade kortet som direkt läggs till i den lokala listan.
 
+### updateCard
+
+```jsx
 async function updateCard(id, brand, model, year, price, image){
     let imagePath = null; // Om ingen bild laddas up ändra inte//
     
@@ -1047,14 +1106,26 @@ async function updateCard(id, brand, model, year, price, image){
             image: imagePath || undefined
     })
 });
+```
+updateCard liknar addCard men har 3 skillnader. "imagePath" börjar som "null" istället för en tom sträng. Null betyder "skicka ingen bild alls och behåll den gamla på servern" En tom sträng hade skrivit över den gamla bilden med ingenting.
 
+"typeof image !== "string" skiljer mellan ett file objekt som är en ny uppladdad bild från filinput och en sträng som är en redan existerande bildsökväg. Bara om det är ett file objekt så laddas en ny bild upp. Det behövs eftersom EditModal håller image state som null när ingen ny bild har valts och som ett File objekt när användaren valt en ny fil.
+
+"image: imagePath || undefined" betyder att om imagePath är null så skickas undefined vilket gör att fältet inte inkluderas i JSON-bodyn över huvudtaget. PATCH-routen på servern uppdaterar bara de input som faktiskt skickas. Om image utelämnas behålls den gamla bilden oförändrad som sagt.
+
+```jsx
 
     const updatedCard = await res.json();
     setCards(prev=>prev.map(c=>c.id == id ? updatedCard : c));
     return updatedCard;
 
 }
+```
+"map()" går igenom varje kort i arrayen. Om kortets id matchar ersätts det med "updatedCard", annars returneras kortet oförändrat. Resultatet blir en ny array med det uppdaterade kortet på rätt plats och allt annat oförändrat, sidan uppdateras direkt utan att hämta om alla kort från servern.
 
+### delCard
+
+```jsx
 async function delCard(id){
     const res = await fetch("/cards/"+id, {method:"DELETE"});
     if (!res.ok){
@@ -1063,6 +1134,11 @@ async function delCard(id){
     }
     setCards(prev => prev.filter(card => card.id !== id));
 }
+```
+delCard är en asynkron funktion som skickar en DELETE-request till servern med kortets id i URL:en. Om servern nekar t.ex om användaren inte äger kortet eller inte är inloggad så kastas ett fel med "throw new Error(data.message)" som fångas av Cards komponenten och visas som text på sidan.
+
+Om det lyckas filtreras kortet bort lokalt med ".filter()" alla kort vars id inte matchar det raderade kortets id behålls i den nya arrayen. Det raderade kortet försvinner direkt från sidan utan att behöva hämta om alla kort från servern igen.
+```jsx
 return(
     <UploadContext.Provider value={{cards,loading,error,addCard,delCard, updateCard}}>
         {children}
@@ -1073,31 +1149,13 @@ return(
 export function useCards(){
     return useContext(UploadContext);
 }
-
 ```
+Det CardProvider returnerar är UploadContext.Provider och är precis som AuthProvider då det är den delen som delar ut datan till resten av applikationen. Som sagt är "value" ett objekt med allt som ska vara tillgänligt för de andra komponenterna som omslutas av CardProvider. I detta fallet ska cards, loading, error, addCard, delCard och updateCard vara tillgängligt. Precis som innan så kan alla komponenter som omsluts av den här Providern läsa värdena och "children" är speciellt prop i React som betyder allt som renderas inuti komponenten.
+
+Här används också en custom hook då useContext(UploadContext) läser Providers value och returnerar det. "useCards" är då en custom hook alltså funktion som anropar de andra hooks inuti sig. Precis som useAuth.
 
 
 
-
-
-
-
-
-
-
-
-App.jsx Klar typ
-main.jsx klar
-About.jsx Simpel komponent klar
-Home.jsx Simpel komponent klar
-
-
-
-AuthModal.jsx
-UploadModal.jsx
-EditModal.jsx
-AuthContext.jsx
-UploadContext.jsx
 
 
 

@@ -16,7 +16,8 @@ function fileFilter(req, file, cb) {
     const allowedTypes = [
         ".png",
         ".jpg",
-        ".jpeg"
+        ".jpeg",
+        ".gif"
     ]
     const ext = path.extname(file.originalname).toLowerCase()
 

@@ -108,5 +108,65 @@
     "image": "/uploads/1775564788167-SkÃ¤rmbild 2025-06-30 160450.png",
     "ownerId": 1775564729350,
     "ownerName": "alva"
+  },
+  {
+    "id": 1775757040229,
+    "brand": "dsadss",
+    "model": "asdasdss",
+    "year": 232322,
+    "price": 23222,
+    "image": "/uploads/1775757040214-Sukablyat.png",
+    "ownerId": 1775757018385,
+    "ownerName": "test5"
+  },
+  {
+    "id": 1775757744049,
+    "brand": "asd",
+    "model": "asd",
+    "year": 232,
+    "price": 32,
+    "image": "/uploads/1775757744044-Reaper.gif",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
+  },
+  {
+    "id": 1775757773854,
+    "brand": "3232",
+    "model": "sadas",
+    "year": 232,
+    "price": 323,
+    "image": "/uploads/1775757773850-Capybara.png",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
+  },
+  {
+    "id": 1775757782886,
+    "brand": "dsad",
+    "model": "asdas",
+    "year": 543,
+    "price": 5435,
+    "image": "/uploads/1775757782882-Blood World.png",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
+  },
+  {
+    "id": 1775757792929,
+    "brand": "asdasd",
+    "model": "asdasd",
+    "year": 232,
+    "price": 31231,
+    "image": "/uploads/1775757792925-Fast sword and Fruit.png",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
+  },
+  {
+    "id": 1775757829472,
+    "brand": "dsad",
+    "model": "asdasd",
+    "year": 2323,
+    "price": 232,
+    "image": "/uploads/1775757829468-FÃ¥gelBG.png",
+    "ownerId": 1775231131632,
+    "ownerName": "55"
   }
 ]

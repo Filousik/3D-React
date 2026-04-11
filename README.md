@@ -62,7 +62,7 @@ function loginAuth(req,res,next){
 }
 ```
 loginAuth skyddar rutter genom att kräva inloggning. Den kontrollerar om `req.session.user` finns annars returnerar den en statuskod 401 ( inte inloggad) och requesten stoppas. Däremot om användaren anses vara inloggad så anropas next() funktionen vilket skickar klientens request vidare till rutten.
-### admin auth
+### adminAuth
 ```js
 function adminAuth(req,res,next){
   if (!req.session.user){

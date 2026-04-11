@@ -21,7 +21,7 @@ a {
 }
 
 .container {
-    padding-left: 10%;
+    padding-left: 2%;
     padding-right: 10%;
 }
 
@@ -59,6 +59,7 @@ header {
 
 .logo {
     width: 180px;
+    cursor: pointer;
 }
 
 .Home {
@@ -189,4 +190,38 @@ footer h2 {
 ::selection {
     background: rgba(99, 179, 237, 0.3);
     color: #fff;
+}
+
+
+
+header {
+    height: auto;       /* Tillåter headern att växa om knapparna skapar nya rader */
+    min-height: 80px;   /* Behåller en snygg lägsta höjd */
+    padding: 10px 0;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;    /* Tillåter logga och nav att dela upp sig på rader */
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;          /* Avståndet mellan loggan och knapp-gruppen */
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;    /* Tillåter knapparna att skapa flera rader inuti naven */
+    gap: 5px;           /* Ändra detta värde för att minska/öka gapet mellan knappar */
+    justify-content: flex-end;
+}
+
+.btn {
+    white-space: nowrap; /* Hindrar texten i knappen från att radbrytas */
+   
+}
+
+.logo {
+    max-width: 150px;
+    height: auto;
+    flex-shrink: 0; /* Hindrar loggan från att klämmas ihop */
 }

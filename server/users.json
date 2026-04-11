@@ -76,5 +76,11 @@
     "username": "pappa",
     "password": "$2b$10$tUMoYzfOIKkraxrnBw9MEuVUgzQEZ5dV3XQv2I3yMQEPaQITAPGVq",
     "role": "user"
+  },
+  {
+    "id": 1775757018385,
+    "username": "test5",
+    "password": "$2b$10$3uZZB.qjNhzE551Q6vr7yuSxmFyebDXxJUZfyVOHZ0Bg5y2gOUhia",
+    "role": "user"
   }
 ]

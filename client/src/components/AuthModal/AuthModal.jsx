@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import "./AuthModal.css";
+
 
 
 export default function AuthModal({onClose}){

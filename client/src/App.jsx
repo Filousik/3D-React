@@ -7,6 +7,8 @@ import AuthModal from './components/AuthModal/AuthModal.jsx'
 import { CardProvider, useCards } from './context/UploadContext.jsx'
 import UploadModal from './components/UploadModal/UploadModal.jsx'
 import EditModal from './components/EditModal/EditModal.jsx'
+import logo from './assets/3DLIFE.png';
+
 
 
 
@@ -67,7 +69,7 @@ function Header({page, setPage, setShowModal, setShowUploadModal}){
       
 
       <nav className='container'>
-          <img src="" alt="" className='logo' />
+          <img onClick={()=>setPage(3)} src={logo} alt="" className='logo' />
           <button className="btn" onClick={()=>setPage(0)}>Home</button>
           <button className="btn" onClick={()=>setPage(1)}>About</button>
           <button className="btn" onClick={()=>setPage(3)}>Cards</button>

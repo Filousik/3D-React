@@ -1,5 +1,8 @@
 # 3D-React
-GA
+## Intro
+Mitt mål för det här projektet var att skapa en plattform där användare kunde dela med sig av 3D modeller via filuppladdning och se previews av modellerna direkt i webbläsaren utan att ladda ner dem. Tanken var att det skulle likna plattformer som pinterest fast 3D modeller. Inom tidsramen för arbetet hann jag inte lägga fokus på 3D funktionerna som jag ville men grunden för filuppladdning och korthantering finns tillsammans med fullstack, autentisering, bilduppladdning och CRUD. 
+
+Dokumentationen nedan beskriver hur min frontend är uppbyggd med JavaScript, React och HTML samt hur backend har byggts med JavaScript och Express i node.
 
 
 
